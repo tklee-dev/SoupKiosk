@@ -21,8 +21,6 @@ namespace KGClient
 
         private string LogH;
 
-        private PrimaryPortName _PrimaryPort;
-
         public string PortNo => Serial?.Port;
 
         protected SerialControl Serial;
@@ -41,7 +39,6 @@ namespace KGClient
         public MioPortBase()
         {
             LogH = $"[{LogHeader}]\t";
-            _PrimaryPort = new PrimaryPortName(PrimaryPortName);
             _PacketManager = new MioPacket();
             _PacketManager.Log = Log;
             _PacketManager.LogId = Log;
@@ -104,28 +101,7 @@ namespace KGClient
                 return await TryOpenPort(portName);
             }
 
-            //우선 포트가 존재하면 우선포트 먼저 시도한다.
-            var defPortName = _PrimaryPort.GetPrimaryPortName();
-            if (String.IsNullOrWhiteSpace(defPortName) == false && portNames.Contains(defPortName))
-            {
-                Log($"{LogH}마지막 성공했던 포트로 연결 시도 ({defPortName})");
-                //우선 포트로 오픈 시도
-                if (await TryOpenPort(defPortName))
-                    return true;
 
-                //우선 포트를 재검색 안하도록 삭제한다.
-                portNames = portNames.Where(p => string.Equals(p, defPortName) == false).ToArray();
-            }
-
-            Log($"{LogH}전체 포트 순차적으로 연결 시도");
-            foreach (var p in portNames)
-            {
-                if (await TryOpenPort(p))
-                {
-                    _PrimaryPort.SetPrimaryPortName(p);
-                    return true;
-                }
-            }
 
             Log($"{LogH}장치를 연결할 수 없음");
             LastError = "장치를 연결할 수 없습니다.";

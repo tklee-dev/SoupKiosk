@@ -15,11 +15,11 @@ namespace KGClient
         SerialPort serialPort = new SerialPort();
         Queue data = new Queue();
 
-        public bool HID_SerialOpen()
+        public bool HID_SerialOpen(string port)
         {
             if (!serialPort.IsOpen)
             {
-                serialPort.PortName = "COM4";
+                serialPort.PortName = port;
                 serialPort.BaudRate = 9600;
                 serialPort.DataBits = 8;
                 serialPort.StopBits = StopBits.One;
@@ -29,9 +29,16 @@ namespace KGClient
 
 
                 if (serialPort.IsOpen)
+                {
+                    MessageBox.Show("HID연결 성공");
                     return true;
+                    
+                }
                 else
+                {
+                    MessageBox.Show("HID연결 실패");
                     return false;
+                }
             }
             else
             {

@@ -101,7 +101,6 @@
     <Compile Include="MioDevices\MioPort.cs" />
     <Compile Include="MioDevices\MioPortBase.cs" />
     <Compile Include="MioDevices\MioVersion.cs" />
-    <Compile Include="MioDevices\PrimaryPortName.cs" />
     <Compile Include="MioDevices\PrintingResult.cs" />
     <Compile Include="MioDevices\SensorK300.cs" />
     <Compile Include="MioDevices\SENSOR_K300_DATA.cs" />
@@ -136,6 +135,9 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="SamplePDF\사업자등록증%28에니텍시스%29_전자세금계산서.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

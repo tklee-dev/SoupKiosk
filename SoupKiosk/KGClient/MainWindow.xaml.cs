@@ -24,36 +24,54 @@ namespace KGClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        protected string LogH { get; set; } = "TEST출력";
+        public string[] serial_list = SerialPort.GetPortNames();
+        public string[] PrinterNames => PrinterSettings.InstalledPrinters.Cast<string>().ToArray();
+
+
+
         MioControl mioControl = new MioControl();
         PrintProcess printProcess = new PrintProcess();
         HIDControl hidControl = new HIDControl();
 
+
         public MainWindow()
         {
             InitializeComponent();
+
+            foreach (var portName in PrinterNames)
+                cbPrinter.Items.Add(portName);
+
+            foreach (var portName in serial_list)
+                cbHID.Items.Add(portName);
+
+            foreach (var portName in serial_list)
+                cbMio.Items.Add(portName);
         }
+
+
 
         //! Click: 장비초기화
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-
-            bool res = await mioControl.InitDeviceAsnyc();
+            bool res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
         }
 
         //! Click: 테스트 출력  + 인증기 배출
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            //! 프린터명 고정 
-            string printerName = "Canon LBP351/352 UFR II";
-            string pdfFilePath = @"D:\02.업무자료_내부\사업자등록증\사업자등록증(에니텍시스)_전자세금계산서.pdf";
-            bool res = await printProcess.PrintProc("1004", printerName, pdfFilePath, mioControl);
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+
+            string pdfFilePath = System.IO.Path.Combine(path, "SamplePDF", "사업자등록증(에니텍시스)_전자세금계산서.pdf");
+
+            bool res = await printProcess.PrintProc("1004", cbPrinter.SelectedItem.ToString(), pdfFilePath, mioControl);
         }
 
 
         //! Click: HID 연결
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            hidControl.HID_SerialOpen();
+            hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
         }
         //! Click: HID 끊기
         private void Button_Click_3(object sender, RoutedEventArgs e)
@@ -62,11 +80,7 @@ namespace KGClient
         }
 
 
-        #region 미사용
-        protected string LogH { get; set; } = "TEST출력";
-        public string[] PrinterNames => PrinterSettings.InstalledPrinters.Cast<string>().ToArray();
-        #endregion
 
-      
+
     }
 }

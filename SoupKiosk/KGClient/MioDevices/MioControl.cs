@@ -26,16 +26,16 @@ namespace KGClient
         public ILedSignal LedSignal { get; private set; }
 
         bool initRes = false;
-        public async Task<bool> InitDeviceAsnyc()
+        public async Task<bool> InitDeviceAsnyc(string portName )
         {
-            initRes = await Initialize();
+            initRes = await Initialize(portName);
             if (initRes == false)
             {
                 MessageBox.Show("포트오픈실패");
             }
             else
             {
-                MessageBox.Show("초기화 성공");
+                MessageBox.Show("초기화 성공 (1/2)");
 
                 initRes = await InitStapler();
                 if (initRes == false)
@@ -44,7 +44,7 @@ namespace KGClient
                 }
                 else
                 {
-                    MessageBox.Show("인증기 성공");
+                    MessageBox.Show("인증기 성공(2/2)");
                 }
             }
 
@@ -52,7 +52,7 @@ namespace KGClient
             return initRes;
         }
 
-        public virtual async Task<bool> Initialize()
+        public virtual async Task<bool> Initialize(string portName)
         {
 
 
@@ -65,7 +65,7 @@ namespace KGClient
 
             //MIO 포트 검색
             var mio = new MioPort();
-            rv = await mio.Open(mport);
+            rv = await mio.Open(portName);
             if (rv == false)
             {
                 SetResultMessage(mio.LastError);

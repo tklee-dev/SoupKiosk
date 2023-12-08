@@ -67,11 +67,6 @@ namespace KGClient
             }
         }
 
-        public string PortName
-        {
-            get { return Queue.QueuePort.Name; }
-        }
-
         /// <summary>
         /// 프린터를 일시 중지 시킨다
         /// </summary>
