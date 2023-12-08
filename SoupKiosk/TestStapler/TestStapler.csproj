@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{40D46859-0C8B-4FB7-9AC6-3AF4EA9F78AE}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TestStapler</RootNamespace>
+    <AssemblyName>TestStapler</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AT2020.cs" />
+    <Compile Include="0_DisposeBase.cs" />
+    <Compile Include="1_MioDeviceBase.cs" />
+    <Compile Include="0_NotifyPropertyChangedBase.cs" />
+    <Compile Include="AT2020_DATA.cs" />
+    <Compile Include="Attributes.cs" />
+    <Compile Include="Converter.cs" />
+    <Compile Include="DeviceID.cs" />
+    <Compile Include="ErrorStatus.cs" />
+    <Compile Include="IDevices.cs" />
+    <Compile Include="Ikeypad.cs" />
+    <Compile Include="ILedSignal.cs" />
+    <Compile Include="ISensorUnit.cs" />
+    <Compile Include="IStapler.cs" />
+    <Compile Include="Keypad.cs" />
+    <Compile Include="KeypadKeys.cs" />
+    <Compile Include="LedSign.cs" />
+    <Compile Include="LedSignK300.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="MioPacket.cs" />
+    <Compile Include="MioPacketData.cs" />
+    <Compile Include="MioPort.cs" />
+    <Compile Include="MioPortBase.cs" />
+    <Compile Include="MioVersion.cs" />
+    <Compile Include="PrimaryPortName.cs" />
+    <Compile Include="PrintingResult.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SensorK300.cs" />
+    <Compile Include="SENSOR_K300_DATA.cs" />
+    <Compile Include="SerialControl.cs" />
+    <Compile Include="StaplerSensorStatus.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\01.Projects\00.공통\JellyLibrary\Code\JellyLibrary\JelLib.Logger\JelLib.Logger.csproj">
+      <Project>{64e5f428-ae28-4a76-a4f0-0785a36305ae}</Project>
+      <Name>JelLib.Logger</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\01.Projects\00.공통\JellyLibrary\Code\JellyLibrary\JelLib\JelLib.csproj">
+      <Project>{3a7360b3-9ff2-4b41-9b7b-98f9df6fa0b2}</Project>
+      <Name>JelLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
