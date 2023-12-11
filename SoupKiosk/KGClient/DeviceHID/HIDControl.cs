@@ -37,6 +37,7 @@ namespace KGClient
                 else
                 {
                     MessageBox.Show("HID연결 실패");
+                    serialPort.Close();
                     return false;
                 }
             }

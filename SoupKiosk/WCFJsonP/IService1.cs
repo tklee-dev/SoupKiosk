@@ -10,6 +10,10 @@ using System.Text;
 namespace WCFJsonP
 {
     //http://localhost:60372/Service1.svc/getdata/ABC
+
+    //http://localhost:60372/Service1.svc/getdata/111?callback=222
+    //http://localhost:60372/Service1.svc/setdata/111%5E222%5E333
+
     // 참고: "리팩터링" 메뉴에서 "이름 바꾸기" 명령을 사용하여 코드 및 config 파일에서 인터페이스 이름 "IService1"을 변경할 수 있습니다.
     [ServiceContract]
     public interface IService1
@@ -38,13 +42,11 @@ namespace WCFJsonP
         [DataMember(Order = 1)]
         public string HID { get; set; }
 
-
         [DataMember(Order = 2)]
-        public string StaplerPrinter { get; set; }
-
+        public string ProximitySensor { get; set; }
 
         [DataMember(Order = 3)]
-        public string ProximitySensor { get; set; }
+        public string StaplerPrinter { get; set; }
     }
 
     //[DataContract]

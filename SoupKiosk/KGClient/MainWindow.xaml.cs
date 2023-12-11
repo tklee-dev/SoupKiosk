@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Printing;
+using System.Drawing;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
@@ -16,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Winforms = System.Windows.Forms;
 
 namespace KGClient
 {
@@ -28,7 +31,7 @@ namespace KGClient
         public string[] serial_list = SerialPort.GetPortNames();
         public string[] PrinterNames => PrinterSettings.InstalledPrinters.Cast<string>().ToArray();
 
-
+        Winforms.NotifyIcon noti;
 
         MioControl mioControl = new MioControl();
         PrintProcess printProcess = new PrintProcess();
@@ -38,6 +41,11 @@ namespace KGClient
         public MainWindow()
         {
             InitializeComponent();
+
+            if (noti == null)
+                SetNotifyIcon();
+
+            this.Hide();
 
             foreach (var portName in PrinterNames)
                 cbPrinter.Items.Add(portName);
@@ -49,20 +57,56 @@ namespace KGClient
                 cbMio.Items.Add(portName);
 
 
-            //todo tray형태로 실행
+            //todo tray형태로 실행 * 완료
             //todo 1. 설정값 읽기 ( Mio Port, HID Port, 프린터명, Watcher경로 )
             //todo 2. 장비 초기화
             //todo 3. FileSystemWatcher 실행 
+        }
 
-            
+        private void SetNotifyIcon()
+        {
+            noti = new Winforms.NotifyIcon();
+            System.Windows.Forms.NotifyIcon icon = new System.Windows.Forms.NotifyIcon();
+            Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/KGClient;component/ImgResource/icons8-compute-60.ico")).Stream;
+            var bitmap = new Bitmap(iconStream);
+            noti.Icon = System.Drawing.Icon.FromHandle(bitmap.GetHicon());
+            noti.Visible = true;
+            noti.Text = "KGClient";
 
+            noti.DoubleClick += delegate (object sender, EventArgs eventArgs)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            };
 
+            Winforms.ContextMenu menu = new Winforms.ContextMenu();
+            Winforms.MenuItem item1 = new Winforms.MenuItem();
+            item1.Text = "프로그램 종료";
 
+            item1.Click += delegate (object sender, EventArgs e)
+            {
+                //todo MIO포트 닫기 *MioControl.cs에 Close 메서드 추가
+                
+                if (hidControl != null)
+                    hidControl.HID_SerialClose();
+
+                Application.Current.Shutdown();
+                noti.Dispose();
+            };
+            menu.MenuItems.Add(item1);
+            noti.ContextMenu = menu;
         }
 
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            //종료되지 않도록 처리 ( 트레이 버튼으로만 종료되도록 ) 
+            this.Hide();
+            e.Cancel = true;
+        }
 
-        //! Click: 장비초기화
+
+        //! Click: MIO 장비초기화
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(cbMio.SelectedItem.ToString()))
@@ -72,7 +116,7 @@ namespace KGClient
             else
             {
                 bool res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
-            }            
+            }
         }
 
         //! Click: 테스트 출력  + 인증기 배출
@@ -102,15 +146,13 @@ namespace KGClient
             else
             {
                 hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
-            }      
+            }
         }
         //! Click: HID 끊기
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             hidControl.HID_SerialClose();
         }
-
-
 
 
     }
