@@ -19,31 +19,32 @@ namespace WCFJsonP
         [WebGet(UriTemplate = "GetData/{value}", ResponseFormat = WebMessageFormat.Json)]
         Stream GetData(string value);
 
-        //[OperationContract]
-        //CompositeType GetDataUsingDataContract(CompositeType composite);
+        [OperationContract]
+        [WebGet(UriTemplate = "SetData/{value}", ResponseFormat = WebMessageFormat.Json)]
+        void SetData(string value);
 
         // TODO: 여기에 서비스 작업을 추가합니다.
     }
     // 아래 샘플에 나타낸 것처럼 데이터 계약을 사용하여 복합 형식을 서비스 작업에 추가합니다.
 
     [DataContract]
-    public class DevicesState
+    public class State
     {
+
         [DataMember(Order = 0)]
-        public string HID { get; set; }
-
-
+        public string ServerState { get; set; }
 
 
         [DataMember(Order = 1)]
-        public string StaplerPrinter { get; set; }
-
-
+        public string HID { get; set; }
 
 
         [DataMember(Order = 2)]
-        public string ProximitySensor { get; set; }
+        public string StaplerPrinter { get; set; }
 
+
+        [DataMember(Order = 3)]
+        public string ProximitySensor { get; set; }
     }
 
     //[DataContract]

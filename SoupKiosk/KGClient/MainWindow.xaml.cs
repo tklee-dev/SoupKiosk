@@ -47,6 +47,17 @@ namespace KGClient
 
             foreach (var portName in serial_list)
                 cbMio.Items.Add(portName);
+
+
+            //todo tray형태로 실행
+            //todo 1. 설정값 읽기 ( Mio Port, HID Port, 프린터명, Watcher경로 )
+            //todo 2. 장비 초기화
+            //todo 3. FileSystemWatcher 실행 
+
+            
+
+
+
         }
 
 
@@ -54,24 +65,44 @@ namespace KGClient
         //! Click: 장비초기화
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            bool res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
+            if (string.IsNullOrEmpty(cbMio.SelectedItem.ToString()))
+            {
+                MessageBox.Show("MIO PORT를 선택하세요");
+            }
+            else
+            {
+                bool res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
+            }            
         }
 
         //! Click: 테스트 출력  + 인증기 배출
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory;
 
-            string pdfFilePath = System.IO.Path.Combine(path, "SamplePDF", "사업자등록증(에니텍시스)_전자세금계산서.pdf");
-
-            bool res = await printProcess.PrintProc("1004", cbPrinter.SelectedItem.ToString(), pdfFilePath, mioControl);
+            if (string.IsNullOrEmpty(cbPrinter.SelectedItem.ToString()))
+            {
+                MessageBox.Show("프린터를 선택하세요");
+            }
+            else
+            {
+                string path = AppDomain.CurrentDomain.BaseDirectory;
+                string pdfFilePath = System.IO.Path.Combine(path, "SamplePDF", "사업자등록증(에니텍시스)_전자세금계산서.pdf");
+                bool res = await printProcess.PrintProc("1004", cbPrinter.SelectedItem.ToString(), pdfFilePath, mioControl);
+            }
         }
 
 
         //! Click: HID 연결
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
+            if (string.IsNullOrEmpty(cbHID.SelectedItem.ToString()))
+            {
+                MessageBox.Show("HID PORT를 선택하세요");
+            }
+            else
+            {
+                hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
+            }      
         }
         //! Click: HID 끊기
         private void Button_Click_3(object sender, RoutedEventArgs e)
