@@ -75,6 +75,7 @@ namespace KGClient
                 }
                 catch (Exception ex)
                 {
+                    Logger.Log(ex.ToString());
                     LastErrorMessage = ex.Message;
                     return false;
                 }

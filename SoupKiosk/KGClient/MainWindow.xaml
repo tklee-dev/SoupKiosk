@@ -6,28 +6,89 @@
         Closing="Window_Closing"
         xmlns:local="clr-namespace:KGClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Device Client" Height="330" Width="520">
 
     <Grid>
-        <StackPanel Orientation="Horizontal"  Height="20" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Orientation="Vertical"   HorizontalAlignment="Left">
 
-            <TextBlock Text="프린터명"/>
-            <ComboBox Width="100" Name="cbPrinter"></ComboBox>
-            
-            
-            <TextBlock Text="Mio포트"/>
-            <ComboBox Width="100" Name="cbMio"></ComboBox>
 
-            <TextBlock Text="HID포트"/>
-            <ComboBox Width="100" Name="cbHID"></ComboBox>
-            
-            
+            <GroupBox Header="설정">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
+                        <TextBlock Text="프린터명" Width="60"/>
+                        <ComboBox Width="200" Name="cbPrinter"></ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="Mio포트" Width="60"/>
+                        <ComboBox Width="200" Name="cbMio" ></ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="HID포트" Width="60"/>
+                        <ComboBox Width="200" Name="cbHID" ></ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="PDF경로" Width="60"/>
+                        <TextBox x:Name="tbPDFDir" Width="170"/>
+                        <Button Content="찾기" Click="Button_PDFDirPath"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="Server URL" Width="60"/>
+                        <TextBox  x:Name="tbServerURL"  Width="200"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="Web URL" Width="60"/>
+                        <TextBox  x:Name="tbWebURL"  Width="200"/>
+                    </StackPanel>
+
+                    <Button Content="설정값 저장"  Click="Button_SaveSettings" Height="40" />
+
+                </StackPanel>
+            </GroupBox>
+
+
+
+
+            <!--<StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                <TextBlock Text="TEST MODE" Width="60"/>
+                <CheckBox x:Name="ckTest"/>
+            </StackPanel>-->
+
+
+
+
+
+
         </StackPanel>
-        <StackPanel  Orientation="Horizontal">
-            <Button Content="장비초기화" Height="200" Width="200" Click="Button_Click"/>
-            <Button Content="테스트출력+인증기" Height="200" Width="200" Click="Button_Click_1"/>
-            <Button Content="HID 연결" Height="200" Width="200" Click="Button_Click_2"/>
-            <Button Content="HID 연결끊기" Height="200" Width="200" Click="Button_Click_3"/>
-        </StackPanel>
+        <GroupBox  Grid.Column="1" Header="테스트">
+            <StackPanel  Orientation="Vertical">
+
+                <Button Content="장비초기화"  Click="Button_Click" Margin="0 5 0 5" Height="30"/>
+                <Button Content="테스트출력+인증기" Click="Button_Click_1"  Margin="0 0 0 5" Height="30"/>
+                <Button Content="HID 연결" Click="Button_Click_2"  Margin="0 0 0 5" Height="30"/>
+                <Button Content="HID 연결끊기" Click="Button_Click_3"  Margin="0 0 0 5" Height="30"/>
+                <Button Content="PDF Watcher" Click="Button_Click_4"  Margin="0 0 0 5" Height="30"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Column="2" Header="운영" >
+            <StackPanel Orientation="Vertical">
+                <Button Content="시작" Click="Button_Start" Width="100" Height="30" Margin="0 5 0 5"/>
+                <Button Content="Port Close" Height="30" Margin="0 5 0 5" Click="Button_PortClose"/>
+                <Button Content="프로그램 종료"  Click="Buton_CloseProgram" Height="30" Margin="0 5 0 5"/>
+                <Button Content="Log 폴더열기"  Click="Buton_OpenLogDir" Height="30" Margin="0 5 0 5"/>
+            </StackPanel>
+        </GroupBox>
+
+
     </Grid>
 </Window>

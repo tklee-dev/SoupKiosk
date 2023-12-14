@@ -26,25 +26,25 @@ namespace KGClient
         public ILedSignal LedSignal { get; private set; }
 
         bool initRes = false;
-        public async Task<bool> InitDeviceAsnyc(string portName )
+        public async Task<bool> InitDeviceAsnyc(string portName)
         {
             initRes = await Initialize(portName);
             if (initRes == false)
             {
-                MessageBox.Show("포트오픈실패");
+                Logger.Log("MIO 포트오픈실패");
             }
             else
             {
-                MessageBox.Show("초기화 성공 (1/2)");
+                Logger.Log("초기화 성공 (1/2)");
 
                 initRes = await InitStapler();
                 if (initRes == false)
                 {
-                    MessageBox.Show("인증기 초기화실패");
+                    Logger.Log("인증기 초기화실패");
                 }
                 else
                 {
-                    MessageBox.Show("인증기 성공(2/2)");
+                    Logger.Log("인증기 성공(2/2)");
                 }
             }
 

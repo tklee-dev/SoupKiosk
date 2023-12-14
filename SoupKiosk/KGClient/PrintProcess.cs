@@ -12,27 +12,16 @@ namespace KGClient
     // PDF를 출력 메인 프로세스 프린트 + 인증기 컨트롤 포함 전체 프로세스를 담당함
     public class PrintProcess
     {
-        protected string LogH { get; set; } = "TEST출력";
+        protected string LogH { get; set; } = "PrintProcess.cs";
 
         public PrintProcess()
         {
 
         }
 
-        public async Task<bool> PrintProc(string hidNumber, string printerName, string pdfPath, MioControl mioControl)
+        public async Task<bool> PrintProc(string printerName, string pdfPath, MioControl mioControl)
         {
-            if (pdfPath.Contains(hidNumber) == false)
-            {
-                if (hidNumber != "1004")
-                {
-                    //todo 입력된 hidNumber와 pdf파일 이름이 일치하지 않는경우
-                    return false;
-                }
-                else
-                {
-                    //nothing "1004" = 테스트 hid 번호
-                }
-            }
+
 
 
             //todo Logger.LogH(LogH, $"{certIndex}번 증명서 출력 시작 - {item.CertName}, 신청부수 {item.Copies}");
@@ -83,9 +72,16 @@ namespace KGClient
                     Print print = new Print();
                     int printResult = await print.PrintFileAsync(pdfPath);
                     if (printResult > 0)
-                        MessageBox.Show("출력 - 성공");
+                    {
+                        Logger.Log("출력 - 성공");
+                        //MessageBox.Show("출력 - 성공");
+                    }
                     else
-                        MessageBox.Show("출력 - 실패");
+                    {
+                        Logger.Log("출력 - 실패");
+                        //MessageBox.Show("출력 - 실패");
+                    }
+
 
                     //테스트용으로 XPS 프린터를 사용할 경우 일시중지 되어 있어도
                     //바로 출력이 되기 때문에 인쇄 작업 갯수를 확인하면 안된다.
@@ -185,7 +181,8 @@ namespace KGClient
                         return false;
                     }
 
-                    Logger.LogH(LogH, $"1부 출력 완료- 정산처리: {needPayment}, 배출처리:{needDispense}");
+                    // Logger.LogH(LogH, $"1부 출력 완료- 정산처리: {needPayment}, 배출처리:{needDispense}");
+                    Logger.LogH(LogH, $"1부 출력 완료");
 
                     //! 용지 배출
                     //prv1 = await mioControl.Stapler.AfterPrint(0, 0, 0, true);

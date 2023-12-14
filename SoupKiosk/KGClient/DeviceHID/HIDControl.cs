@@ -11,9 +11,13 @@ namespace KGClient
 {
     public class HIDControl
     {
-
         SerialPort serialPort = new SerialPort();
         Queue data = new Queue();
+        MainWindow mainWindow = null;
+        public HIDControl(MainWindow mainWindow)
+        {
+            this.mainWindow = mainWindow;
+        }
 
         public bool HID_SerialOpen(string port)
         {
@@ -30,13 +34,11 @@ namespace KGClient
 
                 if (serialPort.IsOpen)
                 {
-                    MessageBox.Show("HID연결 성공");
-                    return true;
-                    
+            
+                    return true;                    
                 }
                 else
                 {
-                    MessageBox.Show("HID연결 실패");
                     serialPort.Close();
                     return false;
                 }
@@ -60,7 +62,7 @@ namespace KGClient
         private void serial_Received(object sender, SerialDataReceivedEventArgs e)
         {
             string getData = serialPort.ReadExisting();
-            MessageBox.Show(getData);
+            mainWindow.ReceivedHIDData(getData);
         }
     }
 

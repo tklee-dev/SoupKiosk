@@ -54,15 +54,21 @@ namespace WCFJsonP
         }
 
         //KGClient로 부터 값 입력
-        public void SetData(string value)
+        public void SetDataHID(string value)
         {
-            // [HID]^[ProximitySensor]^[StaplerPrinter]
-
-            string[] statedata = value.Split('^');
-
-            SaveValues.HID = statedata[0];
-            SaveValues.ProximitySensor = statedata[1];
-            SaveValues.StaplerPrinter = statedata[2];
+            SaveValues.HID = value;
         }
+
+        public void SetDataSensor(string value)
+        {
+            SaveValues.ProximitySensor = value;
+        }
+
+        public void SetDataStaplerPrinter(string value)
+        {
+            SaveValues.StaplerPrinter = value;
+        }
+
+
     }
 }
