@@ -38,7 +38,7 @@ namespace KGClient
             }
             catch (Exception e)
             {
-                MessageBox.Show("WEB Exception: "+ url);
+                //MessageBox.Show("WEB Exception: "+ url);
                 Logger.Log("[WEB] Exception: " + e.ToString());
             }
         }

@@ -96,11 +96,6 @@ namespace KGClient
                 //!  "KGAutoStart" 파일이 있을경우 자동으로 "시작"(메인프로세스) 시작
                 Button_Start(null, null);
             }
-
-
-            //todo 1. 자동 "시작" 되도록 
-            //todo 2. FTP 서버 구성
-            //todo 3. IIS 설정
         }
 
         #region NotifyIcon 처리
@@ -330,7 +325,7 @@ namespace KGClient
 
 
         //! HID
-        string lastHIDnum = "999";
+        string lastHIDnum = "999999";
         //HID 데이터 이벤트
         public void ReceivedHIDData(string hidNum)
         {
@@ -357,9 +352,24 @@ namespace KGClient
                 Logger.Log($"HID 값이 일치하지 않음");
                 Logger.Log($"Last HID Number [{lastHIDnum}]");
                 Logger.Log($"filePath [{filePath}]");
+
+                lastHIDnum = "999999";
+
+                try
+                {
+                    //PDF 파일삭제 
+                    File.Delete(filePath);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(e.ToString());
+
+                }
             }
             else
             {
+                lastHIDnum = "999999";
+
                 Dispatcher.Invoke(DispatcherPriority.Normal, new Action(async delegate
                 {
                     string requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P01";
@@ -374,7 +384,7 @@ namespace KGClient
                     }
                     else
                     {
-                        Logger.Log("출력 완료");
+                        Logger.Log("출력 실패");
                         requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P91";
                         requestHTTP.SetDataToServer(requestURL);
                     }
@@ -389,8 +399,11 @@ namespace KGClient
                         Logger.Log(e.ToString());
 
                     }
+
                 }));
             }
+
+          
         }
 
 
