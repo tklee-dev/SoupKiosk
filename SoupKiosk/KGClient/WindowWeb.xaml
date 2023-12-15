@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KGClient"
         mc:Ignorable="d"
-        Title="WindowWeb" Height="450" Width="800">
+        xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf" 
+        Title="WindowWeb" 
+        WindowState="Maximized" WindowStyle="None"
+        >
     <Grid>
-        
+        <wpf:ChromiumWebBrowser x:Name="ChromeBrowser" KeyDown="ChromeBrowser_KeyDown"/>
     </Grid>
 </Window>

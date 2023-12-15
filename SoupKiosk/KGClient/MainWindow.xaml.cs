@@ -21,6 +21,7 @@ using System.Windows.Shapes;
 using Winforms = System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Threading;
+using System.Reflection;
 
 namespace KGClient
 {
@@ -33,9 +34,7 @@ namespace KGClient
         public string[] serial_list = SerialPort.GetPortNames();
         public string[] PrinterNames => PrinterSettings.InstalledPrinters.Cast<string>().ToArray();
 
-        Winforms.NotifyIcon noti;
-
-        bool isTestMode = false;
+        Winforms.NotifyIcon notifyIcon;
 
         MioControl mioControl = new MioControl();
         PrintProcess printProcess = new PrintProcess();
@@ -43,11 +42,11 @@ namespace KGClient
         RegControl regControl = new RegControl();
         PDFWatcher pdfWatcher = null;
         RequestHTTP requestHTTP = new RequestHTTP();
+        WindowWeb windowWeb = null;
 
         public MainWindow()
         {
-            InitializeComponent();
-
+            InitializeComponent();          
             hidControl = new HIDControl(this);
 
             //Ini컨트롤
@@ -55,12 +54,17 @@ namespace KGClient
             regControl.GetAllReg();
 
             //Tray형태로 넣기
-            if (noti == null)
+            if (notifyIcon == null)
                 SetNotifyIcon();
 
             //! 실행 후 숨기기 ( Tray 형태로 구동 ) 테스트시 주석
-            //this.Hide();
+            this.Hide();
 
+
+
+
+
+            #region 기존 설정값(Reg)을 설정UI에 대입
             //설정 기본값 입력 및 리스트 추가
             foreach (var printerName in PrinterNames)
             {
@@ -82,32 +86,44 @@ namespace KGClient
             tbPDFDir.Text = regControl._PDFDirPath;
             tbServerURL.Text = regControl._ServerURL;
             tbWebURL.Text = regControl._WebURL;
+            #endregion
 
 
-            //todo 1. 시작프로그램 등록 & 자동구동(시작)
+
+            string AutoStartFlagPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "KGAutoStart");
+            if (File.Exists(AutoStartFlagPath))
+            {
+                //!  "KGAutoStart" 파일이 있을경우 자동으로 "시작"(메인프로세스) 시작
+                Button_Start(null, null);
+            }
+
+
+            //todo 1. 자동 "시작" 되도록 
             //todo 2. FTP 서버 구성
             //todo 3. IIS 설정
-            //todo 4. Fullsize 인터넷 띄우기
-
         }
 
+        #region NotifyIcon 처리
         private void SetNotifyIcon()
         {
-            noti = new Winforms.NotifyIcon();
+            notifyIcon = new Winforms.NotifyIcon();
             System.Windows.Forms.NotifyIcon icon = new System.Windows.Forms.NotifyIcon();
             Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/KGClient;component/ImgResource/icons8-compute-60.ico")).Stream;
             var bitmap = new Bitmap(iconStream);
-            noti.Icon = System.Drawing.Icon.FromHandle(bitmap.GetHicon());
-            noti.Visible = true;
-            noti.Text = "KGClient";
+            notifyIcon.Icon = System.Drawing.Icon.FromHandle(bitmap.GetHicon());
+            notifyIcon.Visible = true;
+            notifyIcon.Text = "KGClient";
 
-            noti.Click += delegate (object sender, EventArgs eventArgs)
+            notifyIcon.Click += delegate (object sender, EventArgs eventArgs)
             {
                 this.Show();
                 this.WindowState = WindowState.Normal;
             };
 
         }
+
+        #endregion
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             //종료되지 않도록 처리 ( 트레이 버튼으로만 종료되도록 ) 
@@ -130,7 +146,7 @@ namespace KGClient
             }
             else
             {
-                bool res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());           
+                bool res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
                 if (res)
                 {
                     Logger.Log("MIO 포트 오픈 성공");
@@ -169,7 +185,7 @@ namespace KGClient
             }
             else
             {
-               var res = hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
+                var res = hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
                 if (res)
                 {
                     Logger.Log("HID 포트 오픈 성공");
@@ -201,19 +217,16 @@ namespace KGClient
         {
 
             Button_PortClose(null, null);
-            noti.Dispose();
+            notifyIcon.Dispose();
             Application.Current.Shutdown();
-          
+
         }
 
         //! Click: 세팅값 저장 (Registry)
         private void Button_SaveSettings(object sender, RoutedEventArgs e)
         {
             //입력되지 않은 컨트롤이 있는지 확인
-            if (cbHID.SelectedItem != null && cbMio.SelectedItem != null
-                && cbPrinter != null && !string.IsNullOrWhiteSpace(tbPDFDir.Text)
-                && !string.IsNullOrWhiteSpace(tbServerURL.Text)
-                && !string.IsNullOrWhiteSpace(tbWebURL.Text))
+            if (IsUserInputValid() == true)
             {
                 regControl.ChangeReg(RegKeyNames.MIOPort, cbMio.SelectedItem.ToString());
                 regControl.ChangeReg(RegKeyNames.HIDPort, cbHID.SelectedItem.ToString());
@@ -226,7 +239,7 @@ namespace KGClient
             }
             else
             {
-                MessageBox.Show("설정값이 입력되지 않았습니다.");
+                MessageBox.Show("설정값이 입력되지 않았습니다(1)");
             }
         }
 
@@ -251,10 +264,10 @@ namespace KGClient
 
         string printerName = "";
 
-        //! Click: 메인프로세스
+        //! Click: 시작(메인프로세스)
         private async void Button_Start(object sender, RoutedEventArgs e)
         {
-            printerName = cbPrinter.SelectedItem.ToString();
+
             /*  
              *  1. 포트 오픈 및 장비초기화 (1회)
              *  2. HID번호 인식 대기 및 인식시 *서버전송
@@ -262,39 +275,57 @@ namespace KGClient
              *  4. 출력 및 인증기 프로세스 시작
              *  5. 출력 상태값 전송
              *  6. 완료
-             *  
              */
-
-            //todo 모든 설정값이 입력되어 있는지 확인
-
-            //! HID
-            bool res = hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
-            if (res)
+            try
             {
-                Logger.Log("HID 포트 오픈 성공");
+                if (IsUserInputValid())
+                {
+                    printerName = cbPrinter.SelectedItem.ToString();
+                    //! HID
+                    bool res = hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
+                    if (res)
+                    {
+                        Logger.Log("HID 포트 오픈 성공");
+                    }
+                    else
+                    {
+                        Logger.Log("HID 포트 오픈실패");
+                        MessageBox.Show("HID 포트오픈 실패");
+                    }
+
+                    //! MIO
+                    res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
+                    if (res)
+                    {
+                        Logger.Log("MIO 포트 오픈 성공");
+                    }
+                    else
+                    {
+                        Logger.Log("MIO 초기화 실패");
+                        MessageBox.Show("MIO 초기화 실패");
+                    }
+
+                    //! PDF Watcher
+                    pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
+                    Logger.Log("Watcher 구동완료" + tbPDFDir.Text);
+
+
+                    //! WEB 표출            
+                    windowWeb = new WindowWeb(this, tbWebURL.Text);
+                    windowWeb.Show();
+
+                }
+                else
+                {
+                    MessageBox.Show("설정값이 입력되지 않았습니다(2)");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Log("HID 포트 오픈실패");
-                MessageBox.Show("HID 포트오픈 실패");
+                Logger.Log(ex.ToString());
             }
 
-            //! MIO
-            res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
-            if (res)
-            {
-                Logger.Log("MIO 포트 오픈 성공");
-            }
-            else
-            {
-                Logger.Log("MIO 초기화 실패");
-                MessageBox.Show("MIO 초기화 실패");
-            }
-
-            //! PDF Watcher
-            pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
-            Logger.Log("Watcher 구동완료" + tbPDFDir.Text);
-
+           
         }
 
 
@@ -317,7 +348,7 @@ namespace KGClient
 
 
         //! PDF Watcher
-        public async void PDFCreated(string filePath)
+        public void PDFCreated(string filePath)
         {
             Logger.Log("PDF생성감지: " + filePath);
 
@@ -379,11 +410,53 @@ namespace KGClient
         //! Clikc: 포트닫기
         private void Button_PortClose(object sender, RoutedEventArgs e)
         {
+            if (windowWeb != null)
+            {
+                windowWeb.Close();
+                windowWeb = null;
+            }
 
             mioControl.Dispose();
 
             if (hidControl != null)
                 hidControl.HID_SerialClose();
         }
+
+
+        /// <summary>
+        /// 설정값 모두 입력되었는지 확인
+        /// </summary>
+        /// <returns>true = 모두입력, false = 입력되지 않은 값 있음</returns>
+        private bool IsUserInputValid()
+        {
+            if (cbHID.SelectedItem != null
+                && cbMio.SelectedItem != null
+                && cbPrinter != null
+                && !string.IsNullOrWhiteSpace(tbPDFDir.Text)
+                && !string.IsNullOrWhiteSpace(tbServerURL.Text)
+                && !string.IsNullOrWhiteSpace(tbWebURL.Text))
+                return true;
+            else
+                return false;
+        }
+
+
+        #region 시작프로그램 등록
+
+
+        string programName = "KGClient";
+        //시작 프로그램 등록
+        private void button_RegStartup(object sender, RoutedEventArgs e)
+        {
+            regControl.SetStartupProgram(programName, System.Reflection.Assembly.GetExecutingAssembly().Location);
+        }
+
+        //시작 프로그램 삭제
+        private void button_DeleteStartup(object sender, RoutedEventArgs e)
+        {
+            regControl.DeleteStartupProgram(programName);
+        }
+
+        #endregion
     }
 }

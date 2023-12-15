@@ -21,30 +21,38 @@ namespace KGClient
 
         public bool HID_SerialOpen(string port)
         {
-            if (!serialPort.IsOpen)
+            try
             {
-                serialPort.PortName = port;
-                serialPort.BaudRate = 9600;
-                serialPort.DataBits = 8;
-                serialPort.StopBits = StopBits.One;
-                serialPort.Parity = Parity.None;
-                serialPort.DataReceived += new SerialDataReceivedEventHandler(serial_Received);
-                serialPort.Open();
-
-
-                if (serialPort.IsOpen)
+                if (!serialPort.IsOpen)
                 {
-            
-                    return true;                    
+                    serialPort.PortName = port;
+                    serialPort.BaudRate = 9600;
+                    serialPort.DataBits = 8;
+                    serialPort.StopBits = StopBits.One;
+                    serialPort.Parity = Parity.None;
+                    serialPort.DataReceived += new SerialDataReceivedEventHandler(serial_Received);
+                    serialPort.Open();
+
+
+                    if (serialPort.IsOpen)
+                    {
+
+                        return true;
+                    }
+                    else
+                    {
+                        serialPort.Close();
+                        return false;
+                    }
                 }
                 else
                 {
-                    serialPort.Close();
                     return false;
                 }
             }
-            else
+            catch (Exception e)
             {
+                Logger.Log(e.ToString());
                 return false;
             }
         }

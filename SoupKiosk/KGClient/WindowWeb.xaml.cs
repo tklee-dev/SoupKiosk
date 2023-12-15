@@ -19,9 +19,23 @@ namespace KGClient
     /// </summary>
     public partial class WindowWeb : Window
     {
-        public WindowWeb()
+        MainWindow mainWindow= null;
+        public WindowWeb(MainWindow mainWindow, string url)
         {
             InitializeComponent();
+
+            this.mainWindow = mainWindow;
+            ChromeBrowser.Address = url;
+        }
+
+        private void ChromeBrowser_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.J)
+            {
+                //KGClient 열기
+                mainWindow.Show();
+                mainWindow.Topmost = true;
+            }            
         }
     }
 }

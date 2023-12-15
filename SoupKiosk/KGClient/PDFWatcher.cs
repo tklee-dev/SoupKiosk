@@ -13,21 +13,28 @@ namespace KGClient
         MainWindow mainWindow = null;
         public PDFWatcher(MainWindow mainWindow, string path)
         {
-            this.mainWindow = mainWindow;
+            try
+            {
+                this.mainWindow = mainWindow;
 
-            FileSystemWatcher watcher = new FileSystemWatcher();
-            watcher = new FileSystemWatcher(path, "*.pdf");
+                FileSystemWatcher watcher = new FileSystemWatcher();
+                watcher = new FileSystemWatcher(path, "*.pdf");
 
-            // 생성
-            watcher.Created += watcher_Created;
-            // 삭제
-            watcher.Deleted += watcher_Deleted;
-            //// 이름
-            //watcher.Renamed += watcher_Renamed;
-            //// 에러
-            //watcher.Error += watcher_Error;
-            watcher.IncludeSubdirectories = true;
-            watcher.EnableRaisingEvents = true;
+                // 생성
+                watcher.Created += watcher_Created;
+                // 삭제
+                watcher.Deleted += watcher_Deleted;
+                //// 이름
+                //watcher.Renamed += watcher_Renamed;
+                //// 에러
+                //watcher.Error += watcher_Error;
+                watcher.IncludeSubdirectories = true;
+                watcher.EnableRaisingEvents = true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString());
+            }
         }
 
 
