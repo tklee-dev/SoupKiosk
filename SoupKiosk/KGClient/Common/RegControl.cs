@@ -18,7 +18,8 @@ namespace KGClient
         HIDPort,
         PDFDirPath,
         ServerURL,
-        WebURL
+        WebURL,
+        OffTime
     }
 
     /// <summary>
@@ -54,6 +55,7 @@ namespace KGClient
                     reg.SetValue("PDFDirPath", "999");
                     reg.SetValue("ServerURL", "999");
                     reg.SetValue("WebURL", "999");
+                    reg.SetValue("OffTime", "999");
                 }
             }
             catch (Exception e)
@@ -68,6 +70,7 @@ namespace KGClient
         public string _PDFDirPath { get; set; }
         public string _ServerURL { get; set; }
         public string _WebURL { get; set; }
+        public string _OffTime { get; set; }
 
 
         /// <summary>
@@ -77,12 +80,13 @@ namespace KGClient
         public void GetAllReg()
         {
             RegistryKey reg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AnytekSysKG");
-            _PrinterName = reg.GetValue("PrinterName").ToString();
-            _MIOPort = reg.GetValue("MIOPort").ToString();
-            _HIDPort = reg.GetValue("HIDPort").ToString();
-            _PDFDirPath = reg.GetValue("PDFDirPath").ToString();
-            _ServerURL = reg.GetValue("ServerURL").ToString();
-            _WebURL = reg.GetValue("WebURL").ToString();
+            _PrinterName = reg.GetValue("PrinterName")?.ToString();
+            _MIOPort = reg.GetValue("MIOPort")?.ToString();
+            _HIDPort = reg.GetValue("HIDPort")?.ToString();
+            _PDFDirPath = reg.GetValue("PDFDirPath")?.ToString();
+            _ServerURL = reg.GetValue("ServerURL")?.ToString();
+            _WebURL = reg.GetValue("WebURL")?.ToString();
+            _OffTime = reg.GetValue("OffTime")?.ToString();
 
         }
 
@@ -115,10 +119,15 @@ namespace KGClient
                 case RegKeyNames.WebURL:
                     reg.SetValue("WebURL", value);
                     break;
+                case RegKeyNames.OffTime:
+                    reg.SetValue("OffTime", value);
+                    break;
                 default:
                     break;
             }
         }
+
+
 
 
         // 부팅시 시작 프로그램을 등록하는 레지스트리 경로

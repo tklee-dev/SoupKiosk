@@ -54,6 +54,17 @@
                         <TextBox  x:Name="tbWebURL"  Width="200"/>
                     </StackPanel>
 
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="종료사용" Width="60"/>
+                        <CheckBox  x:Name="checkUseOff" Click="button_UseOff"/>
+
+                        <TextBlock Text="시간설정(24)" Margin="0 0 50 0"/>
+                        <TextBox x:Name="tbHour" Width="20" IsEnabled="False"/>
+                        <TextBlock Text="시"/>
+                        <TextBox x:Name="tbMinute" Width="20"/>
+                        <TextBlock Text="분" IsEnabled="False"/>
+                    </StackPanel>
+
                     <Button Content="설정값 저장"  Click="Button_SaveSettings" Height="40" />
 
                 </StackPanel>
@@ -81,6 +92,7 @@
                 <Button Content="HID 연결" Click="Button_Click_2"  Margin="0 0 0 5" Height="30"/>
                 <Button Content="HID 연결끊기" Click="Button_Click_3"  Margin="0 0 0 5" Height="30"/>
                 <Button Content="PDF Watcher" Click="Button_Click_4"  Margin="0 0 0 5" Height="30"/>
+                <Button Content="윈도우 예약종료" Click="Button_WindowOff" Height="30"/>
             </StackPanel>
         </GroupBox>
 
