@@ -22,6 +22,7 @@ using Winforms = System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Threading;
 using System.Reflection;
+using System.Windows.Interop;
 
 
 /*
@@ -67,6 +68,7 @@ namespace KGClient
         RequestHTTP requestHTTP = new RequestHTTP();
         WindowWeb windowWeb = null;
         DispatcherTimer turnOffTimer = null;
+        Voiceware tts = null;
 
         public MainWindow()
         {
@@ -99,6 +101,11 @@ namespace KGClient
 
             hidControl = new HIDControl(this);
 
+            var shellHwnd = new WindowInteropHelper(Application.Current.MainWindow).Handle;
+            var shellDispatcher = Application.Current.Dispatcher;
+            tts = new Voiceware(shellHwnd, shellDispatcher);
+
+
             //Ini컨트롤
             regControl.CreateReg();
             regControl.GetAllReg();
@@ -118,6 +125,13 @@ namespace KGClient
             if (File.Exists(AutoStartFlagPath))
                 Button_Start(null, null);
         }
+
+
+        #region TTS
+
+
+
+        #endregion
 
 
         #region Method
@@ -313,7 +327,7 @@ namespace KGClient
             //시스템 종료 /s종료, /f응용프로그램 강제종료, /t 0 종료전 대기시간
             System.Diagnostics.Process.Start("shutdown", "/s /f /t 0");
 
-         
+
         }
 
 
@@ -321,6 +335,14 @@ namespace KGClient
         #endregion
 
         #region 테스트 버튼------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        //! TTS 테스트
+        private void Button_TTS테스트(object sender, RoutedEventArgs e)
+        {
+
+            tts.Open();
+            tts.Play($"TTS 테스트 입니다.");
+        }
 
         //! Click: 윈도우 종료 테스트
         private void Button_WindowOff(object sender, RoutedEventArgs e)
@@ -619,6 +641,7 @@ namespace KGClient
             this.Hide();
             e.Cancel = true;
         }
+
         #endregion
 
 

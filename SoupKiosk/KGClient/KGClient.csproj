@@ -151,6 +151,11 @@
     </ApplicationDefinition>
     <Compile Include="PDFWatcher.cs" />
     <Compile Include="RequestHTTP.cs" />
+    <Compile Include="TTS\Defines.cs" />
+    <Compile Include="TTS\PlaySettings.cs" />
+    <Compile Include="TTS\VoiceHelper.cs" />
+    <Compile Include="TTS\Voiceware.cs" />
+    <Compile Include="TTS\vt_kor.cs" />
     <Compile Include="WindowWeb.xaml.cs">
       <DependentUpon>WindowWeb.xaml</DependentUpon>
     </Compile>
@@ -256,6 +261,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="DebenuPDFRendererDLL1311.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="vt_kor.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="ImgResource\icons8-compute-60.ico" />

@@ -122,7 +122,7 @@ namespace KGClient
 
 
         private void Keypad_OnPressKeypadKey(object sender, KeypadKeys e) => _KeypadAction?.Invoke(e);
-구글 번역기        protected virtual StaplerSensorStatus GetDevStaplerSensorStatus() => null;
+        protected virtual StaplerSensorStatus GetDevStaplerSensorStatus() => null;
 
         public Task<bool> InitStapler() => _InitStapler(true);
         protected async Task<bool> _InitStapler(bool runInit)
