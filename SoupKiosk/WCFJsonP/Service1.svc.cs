@@ -20,10 +20,18 @@ namespace WCFJsonP
         {
 
         }
-        string testState = "";
 
-        //http://192.168.0.34:6008/info/Service1.svc/getdata/ABC?callback=123
+
         JavaScriptSerializer serializer = new JavaScriptSerializer();
+
+        /* WCF <> K사 */
+
+        public void TTS(string value)
+        {
+            SaveValues.TTSQueue.Enqueue(value);
+        }
+
+ 
         public Stream GetData(string value)
         {
             //상태값 넣기
@@ -49,11 +57,26 @@ namespace WCFJsonP
             string callback = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["callback"];
             string jsonpResponse = string.Format("{0}({1})", callback, jsonData);
 
-
             return new MemoryStream(Encoding.UTF8.GetBytes(jsonpResponse));
         }
 
-        //KGClient로 부터 값 입력
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*  WCF <> Client */
+
+        //KGClient로 부터 값 입력 POST
         public void SetDataHID(string value)
         {
             SaveValues.HID = value;
@@ -69,6 +92,23 @@ namespace WCFJsonP
             SaveValues.StaplerPrinter = value;
         }
 
+        public Stream GetdataTTS()
+        {
+            //TTS 입력값을 Client에 전달
+            TTSState ttsState = new TTSState();
 
+            if (SaveValues.TTSQueue.Count != 0)
+                ttsState.Text = SaveValues.TTSQueue.Dequeue();
+            else
+                ttsState.Text = "";
+
+            string jsonData = serializer.Serialize(ttsState);
+
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+            WebOperationContext.Current.OutgoingResponse.ContentType = "application/javascript";
+
+            return new MemoryStream(Encoding.UTF8.GetBytes(jsonData));
+
+        }
     }
 }

@@ -127,13 +127,6 @@ namespace KGClient
         }
 
 
-        #region TTS
-
-
-
-        #endregion
-
-
         #region Method
         string printerName = "";
 

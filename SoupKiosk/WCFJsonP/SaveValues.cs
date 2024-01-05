@@ -18,5 +18,8 @@ namespace WCFJsonP
             ProximitySensor = "";
             StaplerPrinter = "";
         }
+
+
+        public static Queue<string> TTSQueue { get; set; } = new Queue<string>();
     }
 }

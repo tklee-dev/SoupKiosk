@@ -150,7 +150,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="PDFWatcher.cs" />
-    <Compile Include="RequestHTTP.cs" />
+    <Compile Include="Service\RequestHTTP.cs" />
     <Compile Include="TTS\Defines.cs" />
     <Compile Include="TTS\PlaySettings.cs" />
     <Compile Include="TTS\VoiceHelper.cs" />
