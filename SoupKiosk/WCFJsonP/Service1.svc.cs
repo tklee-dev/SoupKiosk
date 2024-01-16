@@ -31,7 +31,12 @@ namespace WCFJsonP
             SaveValues.TTSQueue.Enqueue(value);
         }
 
- 
+        public void Reboot()
+        {
+            SaveValues.IsReboot = true;
+        }
+
+
         public Stream GetData(string value)
         {
             //상태값 넣기
@@ -103,12 +108,35 @@ namespace WCFJsonP
                 ttsState.Text = "";
 
             string jsonData = serializer.Serialize(ttsState);
+            return MakeJson(jsonData);
+        }
 
+        public Stream GetdataReboot()
+        {
+            RebootState rebootState = new RebootState();
+            rebootState.IsReboot = SaveValues.IsReboot;
+            SaveValues.IsReboot = false;
+
+            string jsonData = serializer.Serialize(rebootState);
+            return MakeJson(jsonData);
+        }
+
+
+
+
+
+
+
+        // Method
+
+        public Stream MakeJson(string jsonData)
+        {
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
             WebOperationContext.Current.OutgoingResponse.ContentType = "application/javascript";
 
             return new MemoryStream(Encoding.UTF8.GetBytes(jsonData));
-
         }
     }
 }
+
+

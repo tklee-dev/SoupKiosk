@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using System.Text;
 
 namespace WCFJsonP
 {
@@ -25,15 +21,17 @@ namespace WCFJsonP
     public interface IService1
     {
         /* WCF <> K사 */
-
         [OperationContract]
         [WebGet(UriTemplate = "GetData/{value}", ResponseFormat = WebMessageFormat.Json)]
         Stream GetData(string value);
 
-
         [OperationContract]
         [WebGet(UriTemplate = "SetData/tts/{value}", ResponseFormat = WebMessageFormat.Json)]
         void TTS(string value);
+
+        [OperationContract]
+        [WebGet(UriTemplate = "SetData/reboot", ResponseFormat = WebMessageFormat.Json)]
+        void Reboot();
 
 
 
@@ -53,6 +51,10 @@ namespace WCFJsonP
         [OperationContract]
         [WebGet(UriTemplate = "GetdataTTS", ResponseFormat = WebMessageFormat.Json)]
         Stream GetdataTTS();
+
+        [OperationContract]
+        [WebGet(UriTemplate = "GetdataReboot", ResponseFormat = WebMessageFormat.Json)]
+        Stream GetdataReboot();
 
 
     }
@@ -78,5 +80,11 @@ namespace WCFJsonP
     public class TTSState
     {
         public string Text { get; set; }
+    }
+
+    [DataContract]
+    public class RebootState
+    {
+        public bool IsReboot { get; set; }
     }
 }

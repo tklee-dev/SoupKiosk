@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,5 +43,34 @@ namespace KGClient
                 Logger.Log("[WEB] Exception: " + e.ToString());
             }
         }
+
+
+        public T GetDataJson<T>(string url)
+        {
+            using (WebClient wc = new WebClient())
+            {
+                string jsonString = new WebClient()
+                {
+                    Encoding = Encoding.UTF8
+                }.DownloadString(url);
+
+                var jObject = JsonConvert.DeserializeObject<T>(jsonString);
+
+                return (T)Convert.ChangeType(jObject, typeof(T));
+
+            }
+        }
     }
+
+
+    public class TTSObject
+    {
+        public string Text { get; set; }
+    }
+
+    public class RebootObject
+    {
+        public string IsReboot { get; set; }
+    }
+
 }

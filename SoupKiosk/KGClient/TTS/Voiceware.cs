@@ -63,7 +63,7 @@ namespace KGClient
             }
             catch (Exception ex)
             {
-                Logger.LogH(LogH, "초기화: " + LoadResults.EXCEPTION.GetDescription());
+                Logger.LogH(LogH, "TTS초기화: " + LoadResults.EXCEPTION.GetDescription());
                 Logger.Log(ex);
                 return false;
             }
@@ -116,6 +116,8 @@ namespace KGClient
 
         public async Task<bool> PlayAsync(string text)
         {
+
+           
             if (IsLoaded == false)
                 return true;
 

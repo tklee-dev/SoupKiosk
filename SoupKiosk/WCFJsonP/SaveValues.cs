@@ -21,5 +21,7 @@ namespace WCFJsonP
 
 
         public static Queue<string> TTSQueue { get; set; } = new Queue<string>();
+
+        public static bool IsReboot { get; set; } = false;
     }
 }
