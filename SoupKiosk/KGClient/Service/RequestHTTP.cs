@@ -55,10 +55,8 @@ namespace KGClient
                 }.DownloadString(url);
 
                 var jObject = JsonConvert.DeserializeObject<T>(jsonString);
-
                 return (T)Convert.ChangeType(jObject, typeof(T));
-
-            }
+            } 
         }
     }
 

@@ -46,6 +46,7 @@ namespace WCFJsonP
             state.ProximitySensor = SaveValues.ProximitySensor;
             state.StaplerPrinter = SaveValues.StaplerPrinter;
 
+            //todo HID는 logout시 Clear 나머지는 호출 후 Clear
             //초기화
             SaveValues.Clear();
 
@@ -64,18 +65,6 @@ namespace WCFJsonP
 
             return new MemoryStream(Encoding.UTF8.GetBytes(jsonpResponse));
         }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

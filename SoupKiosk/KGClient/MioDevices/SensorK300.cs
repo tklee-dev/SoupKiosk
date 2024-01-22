@@ -44,7 +44,7 @@ namespace KGClient
             get => _IsUserDetected;
             set
             {
-                if (base.SetProperty(ref _IsUserDetected, value))
+                 if (base.SetProperty(ref _IsUserDetected, value))
                 {
                     MioLogger.Log(DeviceID, $"사용자 감지 상태(K300) - {(_IsUserDetected ? "감지" : "미감지")}");
                     if (_RaiseUserDetected)

@@ -32,56 +32,10 @@ using System.Windows.Interop;
  * 
  - this.hide
 
+- HID값 강제 ASCII값
 
- - if (IsUserInputValid() == true)
+- 프린터 드라이버, SFTP, 프로그램 수정사항 챙기기
 
-
-  - regControl.ChangeReg(RegKeyNames.MIOPort, cbMio.SelectedItem.ToString());
-                regControl.ChangeReg(RegKeyNames.HIDPort, cbHID.SelectedItem.ToString());
-                regControl.ChangeReg(RegKeyNames.PrinterName, cbPrinter.SelectedItem.ToString());
-                regControl.ChangeReg(RegKeyNames.PDFDirPath, tbPDFDir.Text);
-                regControl.ChangeReg(RegKeyNames.ServerURL, tbServerURL.Text);
-                regControl.ChangeReg(RegKeyNames.WebURL, tbWebURL.Text);
-
--  if (IsUserInputValid())   //MainProcess
-
-
-   printerName = cbPrinter.SelectedItem.ToString();
-                    //! HID
-                    bool res = hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
-                    if (res)
-                    {
-                        Logger.Log("HID 포트 오픈 성공");
-                    }
-                    else
-                    {
-                        Logger.Log("HID 포트 오픈실패");
-                        MessageBox.Show("HID 포트오픈 실패");
-                    }
-
-                    //! MIO
-                    res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
-                    if (res)
-                    {
-                        Logger.Log("MIO 포트 오픈 성공");
-                    }
-                    else
-                    {
-                        Logger.Log("MIO 초기화 실패");
-                        MessageBox.Show("MIO 초기화 실패");
-                    }
-
-                    //! PDF Watcher
-                    pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
-                    Logger.Log("Watcher 구동완료" + tbPDFDir.Text);
-
-
-                    //! WEB 표출            
-                    windowWeb = new WindowWeb(this, tbWebURL.Text);
-                    windowWeb.Show();
-
- * 
- * 
  */
 
 namespace KGClient
@@ -145,6 +99,7 @@ namespace KGClient
             tts = new Voiceware(shellHwnd, shellDispatcher);
 
 
+
             //Ini컨트롤
             regControl.CreateReg();
             regControl.GetAllReg();
@@ -174,6 +129,8 @@ namespace KGClient
         //HID 데이터 이벤트
         public void ReceivedHIDData(string hidNum)
         {
+            //! TEST
+            hidNum = "25500001";
             //http://localhost:7001/Service1.svc/setdataHID/99
             //http://localhost:7001/Service1.svc/getdata/111?callback=222
             lastHIDnum = hidNum.Trim();
@@ -262,52 +219,50 @@ namespace KGClient
 
             try
             {
-                //if (IsUserInputValid())
-
-                //! TEST
-                if (true)
+                if (IsUserInputValid())
+                ////! TEST
+                //if (true)
                 {
-                    //printerName = cbPrinter.SelectedItem.ToString();
-                    ////! HID
-                    //bool res = hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
-                    //if (res)
-                    //{
-                    //    Logger.Log("HID 포트 오픈 성공");
-                    //}
-                    //else
-                    //{
-                    //    Logger.Log("HID 포트 오픈실패");
-                    //    MessageBox.Show("HID 포트오픈 실패");
-                    //}
+                    printerName = cbPrinter.SelectedItem.ToString();
+                    //! HID
+                    bool res = hidControl.HID_SerialOpen(cbHID.SelectedItem.ToString());
+                    if (res)
+                    {
+                        Logger.Log("HID 포트 오픈 성공");
+                    }
+                    else
+                    {
+                        Logger.Log("HID 포트 오픈실패");
+                        MessageBox.Show("HID 포트오픈 실패");
+                    }
 
-                    ////! MIO
-                    //res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
-                    //if (res)
-                    //{
-                    //    Logger.Log("MIO 포트 오픈 성공");
-                    //}
-                    //else
-                    //{
-                    //    Logger.Log("MIO 초기화 실패");
-                    //    MessageBox.Show("MIO 초기화 실패");
-                    //}
+                    //! MIO
+                    res = await mioControl.InitDeviceAsnyc(cbMio.SelectedItem.ToString());
+                    if (res)
+                    {
+                        Logger.Log("MIO 포트 오픈 성공");
+                        //근접센서 이벤트
+                        mioControl.SensorUnit.OnDetectUserChanged += SensorUnit_OnDetectUserChanged;
+                    }
+                    else
+                    {
+                        Logger.Log("MIO 초기화 실패");
+                        MessageBox.Show("MIO 초기화 실패");
+                    }
 
-                    ////! PDF Watcher
-                    //pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
-                    //Logger.Log("Watcher 구동완료" + tbPDFDir.Text);
+                    //! PDF Watcher
+                    pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
+                    Logger.Log("Watcher 구동완료" + tbPDFDir.Text);
 
 
-                    ////! WEB 표출            
-                    //windowWeb = new WindowWeb(this, tbWebURL.Text);
-                    //windowWeb.Show();
+                    //! WEB 표출            
+                    windowWeb = new WindowWeb(this, tbWebURL.Text);
+                    windowWeb.Show();
 
                     tts.Open();
                     StartRequestWCF();
 
                     WindowTurnOffChecker();
-
-                    //---
-                    //todo 타이머 돌며  Json값 가지고 오기 . 
 
 
 
@@ -323,6 +278,18 @@ namespace KGClient
             }
         }
 
+        private void SensorUnit_OnDetectUserChanged(object sender, EventArgs e)
+        {
+            if (IsSensorTest == true)
+                MessageBox.Show("센서 감지");
+            else
+            {
+                Logger.Log("센서감지:");
+                string requestURL = regControl._ServerURL + "SetDataSensor/01";
+                requestHTTP.SetDataToServer(requestURL);
+            }
+        }
+
         /// <summary>
         /// 반복하여 웹에 n초마다 요청하여 텍스트 값이 있을 경우 TTS를 재생한다. 
         /// </summary>
@@ -334,7 +301,7 @@ namespace KGClient
             jsonTimer.Tick += JsonTimer_Tick;
             jsonTimer.Start();
 
-            //특정 초마다 호출하여 WIndow를 Reboot한다.
+            //특정 초마다 호출하여 Window를 Reboot한다.
             rebootTimer = new DispatcherTimer();
             rebootTimer.Interval = TimeSpan.FromMilliseconds(500);
             rebootTimer.Tick += RebootTimer_Tick; ;
@@ -347,6 +314,7 @@ namespace KGClient
             RebootObject rebootObject = requestHTTP.GetDataJson<RebootObject>(requestURL);
             if (rebootObject.IsReboot == "true")
             {
+                Logger.Log("[JSON] 윈도우 종료");
                 System.Diagnostics.Process.Start("ShutDown", "-r");
             }
         }
@@ -373,7 +341,8 @@ namespace KGClient
 
                 if (ttsObjectQueue.Count > 0)
                 {
-                    //페이지 변경시 바로 음성이 변경되도록 Queue에 쌓지않고 바로 재생.
+                    Logger.Log("[TTS] Play");
+                    //Text 변경시 바로 음성이 변경되도록 Queue에 쌓지않고 바로 재생.
                     tts.Play(ttsObjectQueue.Dequeue().Text);
                 }
             }
@@ -443,6 +412,19 @@ namespace KGClient
 
         #region 테스트 버튼------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+        public bool IsSensorTest { get; set; } = false;
+        //! 근접 센서
+        private void Button_DetectedSensor(object sender, RoutedEventArgs e)
+        {
+            if (IsSensorTest == true)
+                IsSensorTest = false;
+            else
+                IsSensorTest = true;
+            //장비 초기화 이후 실행해야함. 
+            MessageBox.Show("장비초기화 실행, 팝업 보이기: " + IsSensorTest.ToString());
+        }
+
+
         //! Request Json
         private void Button_RequestJsonTTS(object sender, RoutedEventArgs e)
         {
@@ -478,6 +460,8 @@ namespace KGClient
                 if (res)
                 {
                     Logger.Log("MIO 포트 오픈 성공");
+                    //근접센서 이벤트
+                    mioControl.SensorUnit.OnDetectUserChanged += SensorUnit_OnDetectUserChanged;
                 }
                 else
                 {
@@ -672,27 +656,27 @@ namespace KGClient
         private void Button_SaveSettings(object sender, RoutedEventArgs e)
         {
             //입력되지 않은 컨트롤이 있는지 확인
-            //if (IsUserInputValid() == true)
-            //! TEST
-            if (true)
-            {
-                //regControl.ChangeReg(RegKeyNames.MIOPort, cbMio.SelectedItem.ToString());
-                //regControl.ChangeReg(RegKeyNames.HIDPort, cbHID.SelectedItem.ToString());
-                //regControl.ChangeReg(RegKeyNames.PrinterName, cbPrinter.SelectedItem.ToString());
-                //regControl.ChangeReg(RegKeyNames.PDFDirPath, tbPDFDir.Text);
-                //regControl.ChangeReg(RegKeyNames.ServerURL, tbServerURL.Text);
-                //regControl.ChangeReg(RegKeyNames.WebURL, tbWebURL.Text);
+            if (IsUserInputValid() == true)
+                ////! TEST
+                if (true)
+                {
+                    regControl.ChangeReg(RegKeyNames.MIOPort, cbMio.SelectedItem.ToString());
+                    regControl.ChangeReg(RegKeyNames.HIDPort, cbHID.SelectedItem.ToString());
+                    regControl.ChangeReg(RegKeyNames.PrinterName, cbPrinter.SelectedItem.ToString());
+                    regControl.ChangeReg(RegKeyNames.PDFDirPath, tbPDFDir.Text);
+                    regControl.ChangeReg(RegKeyNames.ServerURL, tbServerURL.Text);
+                    regControl.ChangeReg(RegKeyNames.WebURL, tbWebURL.Text);
 
-                if (checkUseOff.IsChecked == true)
-                    regControl.ChangeReg(RegKeyNames.OffTime, tbHour.Text + "^" + tbMinute.Text);
+                    if (checkUseOff.IsChecked == true)
+                        regControl.ChangeReg(RegKeyNames.OffTime, tbHour.Text + "^" + tbMinute.Text);
+                    else
+                        regControl.ChangeReg(RegKeyNames.OffTime, "");
+                    MessageBox.Show("저장 완료");
+                }
                 else
-                    regControl.ChangeReg(RegKeyNames.OffTime, "");
-                MessageBox.Show("저장 완료");
-            }
-            else
-            {
-                MessageBox.Show("설정값이 입력되지 않았습니다(1)");
-            }
+                {
+                    MessageBox.Show("설정값이 입력되지 않았습니다(1)");
+                }
         }
 
 
@@ -756,6 +740,7 @@ namespace KGClient
             this.Hide();
             e.Cancel = true;
         }
+
 
 
         #endregion

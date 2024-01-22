@@ -30,7 +30,7 @@ namespace KGClient
 
         private void ChromeBrowser_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.J)
+            if (e.Key == Key.F7)
             {
                 //KGClient 열기
                 mainWindow.Show();
