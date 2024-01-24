@@ -33,6 +33,14 @@ namespace WCFJsonP
         [WebGet(UriTemplate = "SetData/reboot", ResponseFormat = WebMessageFormat.Json)]
         void Reboot();
 
+        [OperationContract]
+        [WebGet(UriTemplate = "SetData/initHid", ResponseFormat = WebMessageFormat.Json)]
+        void InitHID();
+
+        [OperationContract]
+        [WebGet(UriTemplate = "SetData/initDevice", ResponseFormat = WebMessageFormat.Json)]
+        void InitDevice();
+
 
 
         /*  WCF <> Client */
@@ -56,6 +64,9 @@ namespace WCFJsonP
         [WebGet(UriTemplate = "GetdataReboot", ResponseFormat = WebMessageFormat.Json)]
         Stream GetdataReboot();
 
+        [OperationContract]
+        [WebGet(UriTemplate = "GetdataInitDevice", ResponseFormat = WebMessageFormat.Json)]
+        Stream GetdataInitDevice();
 
     }
     // 아래 샘플에 나타낸 것처럼 데이터 계약을 사용하여 복합 형식을 서비스 작업에 추가합니다.
@@ -86,5 +97,11 @@ namespace WCFJsonP
     public class RebootState
     {
         public bool IsReboot { get; set; }
+    }
+
+    [DataContract]
+    public class InitDeviceState
+    {
+        public bool IsInitDevice { get; set; }
     }
 }

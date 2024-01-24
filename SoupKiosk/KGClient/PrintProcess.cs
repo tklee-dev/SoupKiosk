@@ -118,7 +118,7 @@ namespace KGClient
                     //인증기 명령
                     //if (await _Stapler.SetPageAsync(model.BasicInfo.NumberOfPages, model.BasicInfo.NumberOfPages > 1) == false)
                     //! 인증기 설정 ( 장수 1: (테스트) , Stapler 찍기는 하지 않음) 
-                    if (await mioControl.Stapler.SetPageAsync(1, false) == false)
+                    if (await mioControl.Stapler.SetPageAsync(2, true) == false)
                     {
                         //todo 인증기 설정 실패시 
                         //Logger.DevErrorH(LogH, $"인증기 페이지 설정 - 실패: {_Stapler.ErrorStatus.GetCode()}, {_Stapler.ErrorStatus.GetDescription()}");

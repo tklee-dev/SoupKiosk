@@ -26,6 +26,17 @@ namespace WCFJsonP
 
         /* WCF <> K사 */
 
+        public void InitDevice()
+        {
+            SaveValues.IsInitDevice = true;
+        }
+
+        public void InitHID()
+        {
+            SaveValues.InitHID = true;
+        }
+
+
         public void TTS(string value)
         {
             SaveValues.TTSQueue.Enqueue(value);
@@ -39,6 +50,13 @@ namespace WCFJsonP
 
         public Stream GetData(string value)
         {
+
+            // HID는 initHID 들어온 경우 초기화
+            if (SaveValues.InitHID == true)
+            {
+                SaveValues.HID = "";
+            }
+
             //상태값 넣기
             State state = new State();
             state.ServerState = "02";
@@ -46,8 +64,7 @@ namespace WCFJsonP
             state.ProximitySensor = SaveValues.ProximitySensor;
             state.StaplerPrinter = SaveValues.StaplerPrinter;
 
-            //todo HID는 logout시 Clear 나머지는 호출 후 Clear
-            //초기화
+            //초기화 
             SaveValues.Clear();
 
             //직렬화
@@ -111,7 +128,15 @@ namespace WCFJsonP
         }
 
 
+        public Stream GetdataInitDevice()
+        {
+            InitDeviceState initDeviceState = new InitDeviceState();
+            initDeviceState.IsInitDevice = SaveValues.IsInitDevice;
+            SaveValues.IsInitDevice = false;
 
+            string jsonData = serializer.Serialize(initDeviceState);
+            return MakeJson(jsonData);
+        }
 
 
 

@@ -23,6 +23,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Threading;
 using System.Reflection;
 using System.Windows.Interop;
+using System.Threading;
 
 
 /*
@@ -61,6 +62,7 @@ namespace KGClient
         DispatcherTimer turnOffTimer = null;
         DispatcherTimer jsonTimer = null;
         DispatcherTimer rebootTimer = null;
+        DispatcherTimer initDeviceTimer = null;
         Voiceware tts = null;
 
         public MainWindow()
@@ -263,9 +265,6 @@ namespace KGClient
                     StartRequestWCF();
 
                     WindowTurnOffChecker();
-
-
-
                 }
                 else
                 {
@@ -303,9 +302,28 @@ namespace KGClient
 
             //특정 초마다 호출하여 Window를 Reboot한다.
             rebootTimer = new DispatcherTimer();
-            rebootTimer.Interval = TimeSpan.FromMilliseconds(500);
+            rebootTimer.Interval = TimeSpan.FromMilliseconds(2000);
             rebootTimer.Tick += RebootTimer_Tick; ;
             rebootTimer.Start();
+
+            //특정 초마다 호출하여 Mio를 중지 + 초기화 시킨다.
+            initDeviceTimer = new DispatcherTimer();
+            initDeviceTimer.Interval = TimeSpan.FromMilliseconds(2000);
+            initDeviceTimer.Tick += InitDeviceTimer_Tick;
+            initDeviceTimer.Start();
+        }
+
+        private void InitDeviceTimer_Tick(object sender, EventArgs e)
+        {
+            string requestURL = regControl._ServerURL + "getdataInitDevice";
+            InitDeviceObject initDeviceObject = requestHTTP.GetDataJson<InitDeviceObject>(requestURL);
+            if (initDeviceObject.IsInitDevice == "true")
+            {
+                Logger.Log("[JSON] 장비 중지+재시작");
+                Button_PortClose(null, null);
+                Thread.Sleep(1000);
+                Button_Start(null, null);
+            }
         }
 
         private void RebootTimer_Tick(object sender, EventArgs e)

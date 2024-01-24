@@ -71,4 +71,9 @@ namespace KGClient
         public string IsReboot { get; set; }
     }
 
+    public class InitDeviceObject
+    {
+        public string IsInitDevice { get; set; }
+    }
+
 }
