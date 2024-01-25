@@ -26,6 +26,12 @@ namespace WCFJsonP
 
         /* WCF <> K사 */
 
+        public void print(string param)
+        {
+            //param → {HIDNUM}_{CNT} e.g) "25500000_1^25500000_2^25500000_3^25500000_4^25500000_5^25500000_6"
+            SaveValues.printParam = param;
+        }
+
         public void InitDevice()
         {
             SaveValues.IsInitDevice = true;
@@ -138,6 +144,15 @@ namespace WCFJsonP
             return MakeJson(jsonData);
         }
 
+        public Stream GetdataPrint()
+        {
+            PrintParam printParam = new PrintParam();
+            printParam.printParam = SaveValues.printParam;
+            SaveValues.printParam = "";
+
+            string jsonData = serializer.Serialize(printParam);
+            return MakeJson(jsonData);
+        }
 
 
 

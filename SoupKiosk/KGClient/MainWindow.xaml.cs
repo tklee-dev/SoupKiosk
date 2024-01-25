@@ -63,7 +63,14 @@ namespace KGClient
         DispatcherTimer jsonTimer = null;
         DispatcherTimer rebootTimer = null;
         DispatcherTimer initDeviceTimer = null;
+        DispatcherTimer printResponseTimer = null;
+        DispatcherTimer afterPrintResponseTimer = null;
         Voiceware tts = null;
+
+        //WCF를 통해 들어온 print 요청 pdf 이름들을 저장한다.
+        List<string> printRequestNames = new List<string>();
+        List<string> printCurrentNames = new List<string>();
+
 
         public MainWindow()
         {
@@ -127,7 +134,7 @@ namespace KGClient
         string printerName = "";
 
         //! Serial 이벤트: HID
-        string lastHIDnum = "999999";
+
         //HID 데이터 이벤트
         public void ReceivedHIDData(string hidNum)
         {
@@ -135,25 +142,43 @@ namespace KGClient
             hidNum = "25500001";
             //http://localhost:7001/Service1.svc/setdataHID/99
             //http://localhost:7001/Service1.svc/getdata/111?callback=222
-            lastHIDnum = hidNum.Trim();
+            //lastHIDnum = hidNum.Trim();
 
-            Logger.Log("HID 값:" + lastHIDnum);
-            string requestURL = regControl._ServerURL + "setdataHID/" + lastHIDnum;
+            Logger.Log("HID 값:" + hidNum.Trim());
+            string requestURL = regControl._ServerURL + "setdataHID/" + hidNum.Trim();
             requestHTTP.SetDataToServer(requestURL);
         }
 
-        //! PDF Watcher
-        public void PDFCreated(string filePath)
+        //! PDF Watcher (PDF생성시 LIST넣음,
+        //! 1. 파일에 HID값이 포함안된경우 바로 삭제. ← 삭제예정
+        //! 2. printRequestNames없는 값일 경우 삭제 (다른메서드에서)
+        public void PDFCreated(FileSystemEventArgs e)
         {
-            Logger.Log("PDF생성감지: " + filePath);
+            Logger.Log("PDF생성감지: " + e.FullPath);
+            printCurrentNames.Add(System.IO.Path.ChangeExtension(e.Name, null));
 
-            if (filePath.Contains(lastHIDnum) == false)
+
+
+            //todo 출력 부분 PrintResponseTimer_Tick 쪽으로 옮기기
+            /*
+            Dispatcher.Invoke(DispatcherPriority.Normal, new Action(async delegate
             {
-                Logger.Log($"HID 값이 일치하지 않음");
-                Logger.Log($"Last HID Number [{lastHIDnum}]");
-                Logger.Log($"filePath [{filePath}]");
+                string requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P01";
+                requestHTTP.SetDataToServer(requestURL);
 
-                lastHIDnum = "999999";
+                bool res = await printProcess.PrintProc(printerName, filePath, mioControl);
+                if (res)
+                {
+                    Logger.Log("출력 완료");
+                    requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P05";
+                    requestHTTP.SetDataToServer(requestURL);
+                }
+                else
+                {
+                    Logger.Log("출력 실패");
+                    requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P91";
+                    requestHTTP.SetDataToServer(requestURL);
+                }
 
                 try
                 {
@@ -163,44 +188,12 @@ namespace KGClient
                 catch (Exception e)
                 {
                     Logger.Log(e.ToString());
+
                 }
-            }
-            else
-            {
-                lastHIDnum = "999999";
 
-                Dispatcher.Invoke(DispatcherPriority.Normal, new Action(async delegate
-                {
-                    string requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P01";
-                    requestHTTP.SetDataToServer(requestURL);
-
-                    bool res = await printProcess.PrintProc(printerName, filePath, mioControl);
-                    if (res)
-                    {
-                        Logger.Log("출력 완료");
-                        requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P05";
-                        requestHTTP.SetDataToServer(requestURL);
-                    }
-                    else
-                    {
-                        Logger.Log("출력 실패");
-                        requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P91";
-                        requestHTTP.SetDataToServer(requestURL);
-                    }
-
-                    try
-                    {
-                        //PDF 파일삭제 
-                        File.Delete(filePath);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log(e.ToString());
-
-                    }
-
-                }));
-            }
+            }));
+            */
+            //}
         }
 
         public void PDFDeleted(string filePath)
@@ -311,6 +304,63 @@ namespace KGClient
             initDeviceTimer.Interval = TimeSpan.FromMilliseconds(2000);
             initDeviceTimer.Tick += InitDeviceTimer_Tick;
             initDeviceTimer.Start();
+
+            //특정 초마다 호출하여 print요청이 있는지 확인한다.
+            printResponseTimer = new DispatcherTimer();
+            printResponseTimer.Interval = TimeSpan.FromMilliseconds(500);
+            printResponseTimer.Tick += PrintResponseTimer_Tick; ;
+            printResponseTimer.Start();
+
+            //PrintResponseTimer에 값이 들어온 이후, 
+            //5초동안 printRequestNames 값과, printCurrentNames 값을 비교하기 위한 타이머
+            afterPrintResponseTimer = new DispatcherTimer();
+            afterPrintResponseTimer.Interval = TimeSpan.FromMilliseconds(1000);
+            afterPrintResponseTimer.Tick += AfterPrintResponseTimer_Tick;
+        }
+
+
+
+        private void PrintResponseTimer_Tick(object sender, EventArgs e)
+        {
+            string requestURL = regControl._ServerURL + "getdataPrint";
+            PrintParamObject printParamObject = requestHTTP.GetDataJson<PrintParamObject>(requestURL);
+            if (string.IsNullOrEmpty(printParamObject.printParam) == false)
+            {
+                Logger.Log("[JSON] 출력요청 값 있음" + printParamObject.printParam);
+                printRequestNames = printParamObject.printParam.Split('^').ToList();
+
+                afterPrintResponseTimer.Start();
+            }
+        }
+
+        private void AfterPrintResponseTimer_Tick(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                //의도: 실제 요청한 파일명(printRequestNames)이, 다 ftp올라와 있는지(printCurrentNames) 확인
+
+                printRequestNames.Sort();
+                printCurrentNames.Sort();
+                bool isEqual = Enumerable.SequenceEqual(printRequestNames, printCurrentNames);
+                if (isEqual)
+                {
+                    //모두 다운로드 확인
+                    MessageBox.Show("같음");
+                }
+                else
+                {
+                    MessageBox.Show("다름");
+                }
+
+            }
+            Logger.Log($"Clear전 값 printRequestNames = {printRequestNames}, printCurrentNames = {printCurrentNames}");
+            printRequestNames.Clear();
+            printCurrentNames.Clear();
+            afterPrintResponseTimer.Stop();
+
+            //! 5초 후 모자라거나 cnt가 다를 경우, 전체 삭제. 같이 값이 있을경우 에러 및 전체삭제
+            //!   Timer Stop
+            //todo 파일 삭제 , 리스트 삭제 
         }
 
         private void InitDeviceTimer_Tick(object sender, EventArgs e)

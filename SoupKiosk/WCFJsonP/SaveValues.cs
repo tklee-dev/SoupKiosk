@@ -12,10 +12,13 @@ namespace WCFJsonP
         public static bool InitHID { get; set; }
         public static string ProximitySensor { get; set; } = "00";
         public static string StaplerPrinter { get; set; }
+        public static string printParam { get; set; }
+
 
 
         static public void Clear()
         {
+            printParam = "";
             ProximitySensor = "00";
             StaplerPrinter = "";
             InitHID = false;

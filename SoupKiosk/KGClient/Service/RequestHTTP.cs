@@ -76,4 +76,8 @@ namespace KGClient
         public string IsInitDevice { get; set; }
     }
 
+    public class PrintParamObject
+    {
+        public string printParam { get; set; }
+    }
 }

@@ -40,7 +40,7 @@ namespace KGClient
 
         private void watcher_Created(object sender, FileSystemEventArgs e)
         {
-            mainWindow.PDFCreated(e.FullPath);
+            mainWindow.PDFCreated(e);
         }
         private void watcher_Deleted(object sender, FileSystemEventArgs e)
         {

@@ -154,7 +154,7 @@ namespace KGClient
                     bool needPayment = false;
                     bool needDispense = false;
 
-                    //! 용지 배출 확인 ( 1장으로 세팅함 테스트 ) 
+                    //! 용지 배출 확인 ( 1부로 세팅함 테스트 ) 
                     prv1 = await mioControl.Stapler.AfterPrint(1, 1, 1, true);
                     if (prv1 == PrintingResults.Success)
                     {

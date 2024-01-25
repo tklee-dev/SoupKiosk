@@ -41,6 +41,10 @@ namespace WCFJsonP
         [WebGet(UriTemplate = "SetData/initDevice", ResponseFormat = WebMessageFormat.Json)]
         void InitDevice();
 
+        [OperationContract]
+        [WebGet(UriTemplate = "SetData/print/{value}", ResponseFormat = WebMessageFormat.Json)]
+        void print(string value);
+
 
 
         /*  WCF <> Client */
@@ -67,6 +71,10 @@ namespace WCFJsonP
         [OperationContract]
         [WebGet(UriTemplate = "GetdataInitDevice", ResponseFormat = WebMessageFormat.Json)]
         Stream GetdataInitDevice();
+
+        [OperationContract]
+        [WebGet(UriTemplate = "GetdataPrint", ResponseFormat = WebMessageFormat.Json)]
+        Stream GetdataPrint();
 
     }
     // 아래 샘플에 나타낸 것처럼 데이터 계약을 사용하여 복합 형식을 서비스 작업에 추가합니다.
@@ -103,5 +111,11 @@ namespace WCFJsonP
     public class InitDeviceState
     {
         public bool IsInitDevice { get; set; }
+    }
+
+    [DataContract]
+    public class PrintParam
+    {
+        public string printParam { get; set; }
     }
 }
