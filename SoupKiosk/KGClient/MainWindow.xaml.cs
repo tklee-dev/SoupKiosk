@@ -70,6 +70,7 @@ namespace KGClient
         //WCF를 통해 들어온 print 요청 pdf 이름들을 저장한다.
         List<string> printRequestNames = new List<string>();
         List<string> printCurrentNames = new List<string>();
+        List<string> printCurrentPath = new List<string>();
 
 
         public MainWindow()
@@ -156,44 +157,9 @@ namespace KGClient
         {
             Logger.Log("PDF생성감지: " + e.FullPath);
             printCurrentNames.Add(System.IO.Path.ChangeExtension(e.Name, null));
+            printCurrentPath.Add(e.FullPath);
 
 
-
-            //todo 출력 부분 PrintResponseTimer_Tick 쪽으로 옮기기
-            /*
-            Dispatcher.Invoke(DispatcherPriority.Normal, new Action(async delegate
-            {
-                string requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P01";
-                requestHTTP.SetDataToServer(requestURL);
-
-                bool res = await printProcess.PrintProc(printerName, filePath, mioControl);
-                if (res)
-                {
-                    Logger.Log("출력 완료");
-                    requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P05";
-                    requestHTTP.SetDataToServer(requestURL);
-                }
-                else
-                {
-                    Logger.Log("출력 실패");
-                    requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P91";
-                    requestHTTP.SetDataToServer(requestURL);
-                }
-
-                try
-                {
-                    //PDF 파일삭제 
-                    File.Delete(filePath);
-                }
-                catch (Exception e)
-                {
-                    Logger.Log(e.ToString());
-
-                }
-
-            }));
-            */
-            //}
         }
 
         public void PDFDeleted(string filePath)
@@ -329,38 +295,128 @@ namespace KGClient
                 Logger.Log("[JSON] 출력요청 값 있음" + printParamObject.printParam);
                 printRequestNames = printParamObject.printParam.Split('^').ToList();
 
+                tryCnt = 0;
                 afterPrintResponseTimer.Start();
             }
         }
 
+        int tryCnt = 0;
         private void AfterPrintResponseTimer_Tick(object sender, EventArgs e)
         {
-            for (int i = 0; i < 5; i++)
+            try
             {
-                //의도: 실제 요청한 파일명(printRequestNames)이, 다 ftp올라와 있는지(printCurrentNames) 확인
+                List<string> _printRequestNames = new List<string>();
+                List<string> _printCurrentNames = new List<string>();
+                List<string> _printCurrentPath = new List<string>();
 
-                printRequestNames.Sort();
-                printCurrentNames.Sort();
-                bool isEqual = Enumerable.SequenceEqual(printRequestNames, printCurrentNames);
-                if (isEqual)
+                _printRequestNames = printRequestNames;
+                _printCurrentNames = printCurrentNames;
+                _printCurrentPath = printCurrentPath;
+
+
+                Logger.Log("PrintResponse프로세스 시작");
+                if (tryCnt < 5)
                 {
-                    //모두 다운로드 확인
-                    MessageBox.Show("같음");
+                    tryCnt++;
+
+                    //의도: 실제 요청한 파일명(printRequestNames)이, 다 ftp올라와 있는지(printCurrentNames) 확인
+                    _printRequestNames.Sort();
+                    _printCurrentNames.Sort();
+                    _printCurrentPath.Sort();
+                    bool isEqual = Enumerable.SequenceEqual(_printRequestNames, _printCurrentNames);
+                    if (isEqual)
+                    {
+                        //모두 다운로드 확인, 인쇄시작
+                        afterPrintResponseTimer.Stop();
+                        Logger.Log("같음");
+                        //foreach (var item in printRequestNames)
+                        //    Logger.Log($"printRequestNames = " + item);
+
+                        //foreach (var item in printCurrentNames)
+                        //    Logger.Log($"printCurrentNames = " + item);
+
+                        Task.Delay(2000);
+                        //출력 
+                        Dispatcher.Invoke(DispatcherPriority.Normal, new Action(async delegate
+                        {
+                            string requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P01";
+                            requestHTTP.SetDataToServer(requestURL);
+
+                            bool res = await printProcess.PrintProc(printerName, _printCurrentPath, mioControl);
+                            if (res)
+                            {
+                                Logger.Log("출력 완료");
+                                requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P05";
+                                requestHTTP.SetDataToServer(requestURL);
+
+                                AfterPrintWorkClear();
+                            }
+                            else
+                            {
+                                Logger.Log("출력 실패");
+                                requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P91";
+                                requestHTTP.SetDataToServer(requestURL);
+
+                                AfterPrintWorkClear();
+                            }
+
+                        }));
+
+                    }
+                    else
+                    {
+
+                        Logger.Log($"다름({tryCnt})");
+                        foreach (var item in _printRequestNames)
+                            Logger.Log($"printRequestNames = " + item);
+
+                        foreach (var item in _printCurrentNames)
+                            Logger.Log($"printCurrentNames = " + item);
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("다름");
-                }
+                    //5회 이상 시도
+                    Logger.Log("PrintResponse프로세스 종료");
+                    foreach (var item in _printRequestNames)
+                        Logger.Log($"printRequestNames = " + item);
 
+                    foreach (var item in _printCurrentNames)
+                        Logger.Log($"printCurrentNames = " + item);
+
+                    AfterPrintWorkClear();
+                }
             }
-            Logger.Log($"Clear전 값 printRequestNames = {printRequestNames}, printCurrentNames = {printCurrentNames}");
+            catch (Exception ex)
+            {
+                Logger.Log(ex.ToString());
+            }
+        }
+
+        private void AfterPrintWorkClear()
+        {
             printRequestNames.Clear();
             printCurrentNames.Clear();
+            printCurrentPath.Clear();
             afterPrintResponseTimer.Stop();
 
-            //! 5초 후 모자라거나 cnt가 다를 경우, 전체 삭제. 같이 값이 있을경우 에러 및 전체삭제
-            //!   Timer Stop
-            //todo 파일 삭제 , 리스트 삭제 
+            //파일 내 모든 파일삭제
+            try
+            {
+                string path = tbPDFDir.Text;
+
+                DirectoryInfo directory = new DirectoryInfo(path);
+
+                foreach (FileInfo file in directory.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString());
+            }
+
         }
 
         private void InitDeviceTimer_Tick(object sender, EventArgs e)
@@ -550,8 +606,9 @@ namespace KGClient
             else
             {
                 string path = AppDomain.CurrentDomain.BaseDirectory;
-                string pdfFilePath = System.IO.Path.Combine(path, "SamplePDF", "사업자등록증(에니텍시스)_전자세금계산서.pdf");
-                bool res = await printProcess.PrintProc(cbPrinter.SelectedItem.ToString(), pdfFilePath, mioControl);
+                List<string> pdfPathList = new List<string>();
+                pdfPathList.Add(System.IO.Path.Combine(path, "SamplePDF", "사업자등록증(에니텍시스)_전자세금계산서.pdf"));
+                bool res = await printProcess.PrintProc(cbPrinter.SelectedItem.ToString(), pdfPathList, mioControl);
             }
         }
 

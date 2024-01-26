@@ -102,7 +102,7 @@ namespace KGClient
                 if (rv != 1)
                     throw new Exception("Pdf 파일 로드 실패 - " + pdfFilePath);
 
-                var iPrintOptions = lib.PrintOptions(0, 0, "Nts Certificate");
+                var iPrintOptions = lib.PrintOptions(0, 0, "K Certificate");
                 rv = lib.PrintDocument(lib.GetDefaultPrinterName(), 1, lib.PageCount(), iPrintOptions);
 
                 if (rv != 1)

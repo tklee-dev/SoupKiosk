@@ -28,16 +28,19 @@ namespace KGClient
             }
         }
 
-        public async Task<int> PrintFileAsync(string pdfFilePath)
+        public async Task<int> PrintFileAsync(List<string> pdfFilePathList)
         {
-            return await Task.Run(() => PrintFile(pdfFilePath));
+            return await Task.Run(() => PrintFile(pdfFilePathList));
         }
 
-        public int PrintFile(string pdfFilePath)
+        public int PrintFile(List<string> pdfFilePathList)
         {
             try
             {
-                PrintPdf.Print(pdfFilePath);
+                foreach (var item in pdfFilePathList)
+                {
+                    PrintPdf.Print(item);
+                }
                 return 1;
             }
             catch (Exception ex)
