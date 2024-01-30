@@ -57,11 +57,6 @@ namespace WCFJsonP
         public Stream GetData(string value)
         {
 
-            // HID는 initHID 들어온 경우 초기화
-            if (SaveValues.InitHID == true)
-            {
-                SaveValues.HID = "";
-            }
 
             //상태값 넣기
             State state = new State();
@@ -154,6 +149,15 @@ namespace WCFJsonP
             return MakeJson(jsonData);
         }
 
+        public Stream GetdataInitHID()
+        {
+            InitHIDParam initHIDParam = new InitHIDParam();
+            initHIDParam.IsInitHID = SaveValues.InitHID;
+            SaveValues.InitHID = false;
+
+            string jsonData = serializer.Serialize(initHIDParam);
+            return MakeJson(jsonData);
+        }
 
 
         // Method

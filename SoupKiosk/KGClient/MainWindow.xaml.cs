@@ -65,6 +65,8 @@ namespace KGClient
         DispatcherTimer initDeviceTimer = null;
         DispatcherTimer printResponseTimer = null;
         DispatcherTimer afterPrintResponseTimer = null;
+        DispatcherTimer initHIDCheckTimer = null;
+
         Voiceware tts = null;
 
         //WCF를 통해 들어온 print 요청 pdf 이름들을 저장한다.
@@ -282,9 +284,26 @@ namespace KGClient
             afterPrintResponseTimer = new DispatcherTimer();
             afterPrintResponseTimer.Interval = TimeSpan.FromMilliseconds(1000);
             afterPrintResponseTimer.Tick += AfterPrintResponseTimer_Tick;
+
+            //HID 초기화 요청이 있는지 확인
+            initHIDCheckTimer = new DispatcherTimer();
+            initHIDCheckTimer.Interval = TimeSpan.FromMilliseconds(1000);
+            initHIDCheckTimer.Tick += InitHIDCheckTimer_Tick;
         }
 
-
+        private void InitHIDCheckTimer_Tick(object sender, EventArgs e)
+        {
+            //서버에서 초기화 요청시, 서버에 ""값 HID값을 전송
+            string requestURL = regControl._ServerURL + "GetdataInitHID";
+            InitHIDParam initHIDParam = requestHTTP.GetDataJson<InitHIDParam>(requestURL);
+            if (initHIDParam.IsInitHID == "true")
+            {
+                Logger.Log("[JSON] HID값 초기화");
+                // 서버에 빈값 HID를 전송. 
+                 requestURL = regControl._ServerURL + "setdataHID/" + "";
+                requestHTTP.SetDataToServer(requestURL);
+            }
+        }
 
         private void PrintResponseTimer_Tick(object sender, EventArgs e)
         {
@@ -438,7 +457,7 @@ namespace KGClient
             RebootObject rebootObject = requestHTTP.GetDataJson<RebootObject>(requestURL);
             if (rebootObject.IsReboot == "true")
             {
-                Logger.Log("[JSON] 윈도우 종료");
+                Logger.Log("[JSON] 윈도우 재시작");
                 System.Diagnostics.Process.Start("ShutDown", "-r");
             }
         }
@@ -648,16 +667,20 @@ namespace KGClient
         #endregion
 
         #region 운영그룹------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+        //프린터 상태 조회 웹 
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            string url = "http://169.254.115.21/";
+            var prs = new ProcessStartInfo("msedge", url);
+            Process.Start(prs);
+        }
 
         //! Click: 프로그램 종료
         private void Buton_CloseProgram(object sender, RoutedEventArgs e)
         {
-
             Button_PortClose(null, null);
             notifyIcon.Dispose();
             Application.Current.Shutdown();
-
         }
 
 
@@ -691,9 +714,6 @@ namespace KGClient
         {
             await MainProcess();
         }
-
-
-
         #endregion
 
         #region 시작프로그램 등록------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -868,8 +888,9 @@ namespace KGClient
 
 
 
+
         #endregion
 
-
+       
     }
 }

@@ -16,10 +16,8 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-   
 
         <StackPanel Grid.Column="0" Orientation="Vertical"   HorizontalAlignment="Left">
-
 
             <GroupBox Header="설정">
                 <StackPanel>
@@ -70,20 +68,14 @@
                 </StackPanel>
             </GroupBox>
 
-
-
-
             <!--<StackPanel Orientation="Horizontal" Margin="0 0 0 5">
                 <TextBlock Text="TEST MODE" Width="60"/>
                 <CheckBox x:Name="ckTest"/>
             </StackPanel>-->
-
-
-
-
-
-
         </StackPanel>
+        
+        
+        
         <GroupBox  Grid.Column="1" Header="테스트">
             <StackPanel  Orientation="Vertical">
 
@@ -105,6 +97,7 @@
                 <Button Content="중지" Height="30" Margin="0 5 0 5" Click="Button_PortClose"/>
                 <Button Content="프로그램 종료"  Click="Buton_CloseProgram" Height="30" Margin="0 5 0 5"/>
                 <Button Content="Log 폴더열기"  Click="Buton_OpenLogDir" Height="30" Margin="0 5 0 5"/>
+                <Button Content="프린터 상태정보" Margin="0 5 0 5" Height="30" Click="Button_Click_5"/>
                 <Button Content="시작프로그램등록" Click="button_RegStartup"/>
                 <Button Content="시작프로그램삭제" Click="button_DeleteStartup"/>
             </StackPanel>

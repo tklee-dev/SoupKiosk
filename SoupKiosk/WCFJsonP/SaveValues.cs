@@ -20,8 +20,7 @@ namespace WCFJsonP
         {
             printParam = "";
             ProximitySensor = "00";
-            StaplerPrinter = "";
-            InitHID = false;
+            StaplerPrinter = "";            
             IsInitDevice = false;
         }
 

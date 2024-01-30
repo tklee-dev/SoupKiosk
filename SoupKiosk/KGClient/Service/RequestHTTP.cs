@@ -76,6 +76,11 @@ namespace KGClient
         public string IsInitDevice { get; set; }
     }
 
+    public class InitHIDParam
+    {
+        public string IsInitHID { get; set; }
+    }
+
     public class PrintParamObject
     {
         public string printParam { get; set; }
