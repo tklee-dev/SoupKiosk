@@ -86,7 +86,7 @@
                 <Button Content="PDF Watcher" Click="Button_Click_4"  Margin="0 0 0 5" Height="30"/>
                 <Button Content="윈도우 예약종료" Click="Button_WindowOff" Height="30"  Margin="0 0 0 5" />
                 <Button Content="TTS 테스트" Click="Button_TTS테스트" Height="30" Margin="0 0 0 5"/>
-                <Button Content="Request Json(TTS)" Click="Button_RequestJsonTTS" Height="30" Margin="0 0 0 5"/>
+             
                 <Button Content="Detected Sensor" Click="Button_DetectedSensor" Height="30"/>
             </StackPanel>
         </GroupBox>
@@ -98,6 +98,7 @@
                 <Button Content="프로그램 종료"  Click="Buton_CloseProgram" Height="30" Margin="0 5 0 5"/>
                 <Button Content="Log 폴더열기"  Click="Buton_OpenLogDir" Height="30" Margin="0 5 0 5"/>
                 <Button Content="프린터 상태정보" Margin="0 5 0 5" Height="30" Click="Button_Click_5"/>
+                <Button Content="FTP폴더 열기" Margin="0 5 0 5" Height="30" Click="Button_Click_6"/>
                 <Button Content="시작프로그램등록" Click="button_RegStartup"/>
                 <Button Content="시작프로그램삭제" Click="button_DeleteStartup"/>
             </StackPanel>

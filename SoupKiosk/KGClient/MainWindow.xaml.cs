@@ -414,6 +414,7 @@ namespace KGClient
 
         private void AfterPrintWorkClear()
         {
+            Logger.Log("AfterPrintWorkClear()");
             printRequestNames.Clear();
             printCurrentNames.Clear();
             printCurrentPath.Clear();
@@ -568,14 +569,6 @@ namespace KGClient
         }
 
 
-        //! Request Json
-        private void Button_RequestJsonTTS(object sender, RoutedEventArgs e)
-        {
-            string requestURL = regControl._ServerURL + "GetdataTTS";
-            TTSObject ttsObject = requestHTTP.GetDataJson<TTSObject>(requestURL);
-            MessageBox.Show(ttsObject.Text);
-        }
-
         //! TTS 테스트
         private async void Button_TTS테스트(object sender, RoutedEventArgs e)
         {
@@ -667,7 +660,15 @@ namespace KGClient
         #endregion
 
         #region 운영그룹------------------------------------------------------------------------------------------------------------------------------------------------------------
-        //프린터 상태 조회 웹 
+        //! FTP 폴더열기
+        private void Button_Click_6(object sender, RoutedEventArgs e)
+        {
+            string dirPath = AppDomain.CurrentDomain.BaseDirectory;
+            dirPath = tbPDFDir.Text;
+            Process.Start(dirPath);
+        }
+
+        //! 프린터 상태 조회 웹 
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
             string url = "http://169.254.115.21/";
@@ -889,8 +890,9 @@ namespace KGClient
 
 
 
+
         #endregion
 
-       
+     
     }
 }
