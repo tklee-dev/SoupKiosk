@@ -42,7 +42,7 @@ namespace KGClient
             }
             catch (Exception ex)
             {
-                Logger.LogH(LogH, "생성: " + LoadResults.EXCEPTION.GetDescription());
+                Logger.LogH(LogH, "생성Exceptioin: " + LoadResults.EXCEPTION.GetDescription());
                 Logger.Log(ex);
             }
         }

@@ -83,7 +83,7 @@ namespace KGClient
             if (IsExistProcess(Process.GetCurrentProcess().ProcessName))
             {
                 Buton_CloseProgram(null, null);
-                Logger.Log("중복실행 실행하지 않음");
+                Logger.Log("중복실행, 실행하지 않음");
             }
 
             bool IsExistProcess(string processName)
@@ -106,9 +106,6 @@ namespace KGClient
 
             hidControl = new HIDControl(this);
 
-            var shellHwnd = new WindowInteropHelper(Application.Current.MainWindow).Handle;
-            var shellDispatcher = Application.Current.Dispatcher;
-            tts = new Voiceware(shellHwnd, shellDispatcher);
 
 
 
@@ -120,8 +117,8 @@ namespace KGClient
             if (notifyIcon == null)
                 SetNotifyIcon();
 
-            //!  실행 후 숨기기 ( Tray 형태로 구동 ) 테스트시 주석
-            //this.Hide();
+            ////!  실행 후 숨기기 ( Tray 형태로 구동 ) 테스트시 아래 주석
+            this.Hide();
 
             //Reg값 Control에 입력
             InputSettingValues();
@@ -141,8 +138,8 @@ namespace KGClient
         //HID 데이터 이벤트
         public void ReceivedHIDData(string hidNum)
         {
-            //! TEST
-            hidNum = "25500001";
+            ////! TEST
+            ////hidNum = "25500001";
             //http://localhost:7001/Service1.svc/setdataHID/99
             //http://localhost:7001/Service1.svc/getdata/111?callback=222
             //lastHIDnum = hidNum.Trim();
@@ -182,6 +179,13 @@ namespace KGClient
 
             try
             {
+
+                //TTS 생성
+                var shellHwnd = new WindowInteropHelper(this).Handle;
+
+                var shellDispatcher = Application.Current.Dispatcher;
+                tts = new Voiceware(shellHwnd, shellDispatcher);
+
                 if (IsUserInputValid())
                 ////! TEST
                 //if (true)
@@ -300,7 +304,7 @@ namespace KGClient
             {
                 Logger.Log("[JSON] HID값 초기화");
                 // 서버에 빈값 HID를 전송. 
-                 requestURL = regControl._ServerURL + "setdataHID/" + "";
+                requestURL = regControl._ServerURL + "setdataHID/" + "";
                 requestHTTP.SetDataToServer(requestURL);
             }
         }
@@ -572,6 +576,12 @@ namespace KGClient
         //! TTS 테스트
         private async void Button_TTS테스트(object sender, RoutedEventArgs e)
         {
+            //TTS 생성
+            var shellHwnd = new WindowInteropHelper(this).Handle;
+
+            var shellDispatcher = Application.Current.Dispatcher;
+            tts = new Voiceware(shellHwnd, shellDispatcher);
+
             tts.Open();
             await tts.PlayAsync("안녕하세요. 무인민원발급기입니다.");
         }
@@ -680,7 +690,8 @@ namespace KGClient
         private void Buton_CloseProgram(object sender, RoutedEventArgs e)
         {
             Button_PortClose(null, null);
-            notifyIcon.Dispose();
+            if (notifyIcon != null)
+                notifyIcon.Dispose();
             Application.Current.Shutdown();
         }
 
@@ -893,6 +904,6 @@ namespace KGClient
 
         #endregion
 
-     
+
     }
 }

@@ -161,7 +161,6 @@ namespace WCFJsonP
 
 
         // Method
-
         public Stream MakeJson(string jsonData)
         {
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
