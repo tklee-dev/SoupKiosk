@@ -88,6 +88,7 @@
                 <Button Content="TTS 테스트" Click="Button_TTS테스트" Height="30" Margin="0 0 0 5"/>
              
                 <Button Content="Detected Sensor" Click="Button_DetectedSensor" Height="30"/>
+                <Button Content="Web Browser" Click="Button_Click_7"  Height="30"/>
             </StackPanel>
         </GroupBox>
 

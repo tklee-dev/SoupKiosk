@@ -560,6 +560,16 @@ namespace KGClient
 
         #region 테스트 버튼------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+        private void Button_Click_7(object sender, RoutedEventArgs e)
+        {
+            Process exObject = new Process();
+            exObject.StartInfo.FileName = "msedge.exe";
+            exObject.StartInfo.Arguments = $"--kiosk {tbWebURL.Text} --edge-kiosk-type=fullscreen";
+            Logger.DevH(LogH, "230223 Start APP: Edge");
+            exObject.Start();
+        }
+
         public bool IsSensorTest { get; set; } = false;
         //! 근접 센서
         private void Button_DetectedSensor(object sender, RoutedEventArgs e)
@@ -902,8 +912,9 @@ namespace KGClient
 
 
 
+
         #endregion
 
-
+        
     }
 }
