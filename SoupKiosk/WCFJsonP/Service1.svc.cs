@@ -39,7 +39,7 @@ namespace WCFJsonP
 
         public void InitHID()
         {
-            SaveValues.InitHID = true;
+            SaveValues.HID = "";
         }
 
 
@@ -146,16 +146,6 @@ namespace WCFJsonP
             SaveValues.printParam = "";
 
             string jsonData = serializer.Serialize(printParam);
-            return MakeJson(jsonData);
-        }
-
-        public Stream GetdataInitHID()
-        {
-            InitHIDParam initHIDParam = new InitHIDParam();
-            initHIDParam.IsInitHID = SaveValues.InitHID;
-            SaveValues.InitHID = false;
-
-            string jsonData = serializer.Serialize(initHIDParam);
             return MakeJson(jsonData);
         }
 

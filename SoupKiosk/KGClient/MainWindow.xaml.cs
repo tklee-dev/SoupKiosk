@@ -65,7 +65,6 @@ namespace KGClient
         DispatcherTimer initDeviceTimer = null;
         DispatcherTimer printResponseTimer = null;
         DispatcherTimer afterPrintResponseTimer = null;
-        DispatcherTimer initHIDCheckTimer = null;
 
         Voiceware tts = null;
 
@@ -288,26 +287,9 @@ namespace KGClient
             afterPrintResponseTimer = new DispatcherTimer();
             afterPrintResponseTimer.Interval = TimeSpan.FromMilliseconds(1000);
             afterPrintResponseTimer.Tick += AfterPrintResponseTimer_Tick;
-
-            //HID 초기화 요청이 있는지 확인
-            initHIDCheckTimer = new DispatcherTimer();
-            initHIDCheckTimer.Interval = TimeSpan.FromMilliseconds(1000);
-            initHIDCheckTimer.Tick += InitHIDCheckTimer_Tick;
         }
 
-        private void InitHIDCheckTimer_Tick(object sender, EventArgs e)
-        {
-            //서버에서 초기화 요청시, 서버에 ""값 HID값을 전송
-            string requestURL = regControl._ServerURL + "GetdataInitHID";
-            InitHIDParam initHIDParam = requestHTTP.GetDataJson<InitHIDParam>(requestURL);
-            if (initHIDParam.IsInitHID == "true")
-            {
-                Logger.Log("[JSON] HID값 초기화");
-                // 서버에 빈값 HID를 전송. 
-                requestURL = regControl._ServerURL + "setdataHID/" + "";
-                requestHTTP.SetDataToServer(requestURL);
-            }
-        }
+
 
         private void PrintResponseTimer_Tick(object sender, EventArgs e)
         {

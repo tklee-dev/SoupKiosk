@@ -76,10 +76,6 @@ namespace WCFJsonP
         [WebGet(UriTemplate = "GetdataPrint", ResponseFormat = WebMessageFormat.Json)]
         Stream GetdataPrint();
 
-        [OperationContract]
-        [WebGet(UriTemplate = "GetdataInitHID", ResponseFormat = WebMessageFormat.Json)]
-        Stream GetdataInitHID();
-
     }
     // 아래 샘플에 나타낸 것처럼 데이터 계약을 사용하여 복합 형식을 서비스 작업에 추가합니다.
 
@@ -121,10 +117,5 @@ namespace WCFJsonP
     public class PrintParam
     {
         public string printParam { get; set; }
-    }
-
-    public class InitHIDParam
-    {
-        public bool IsInitHID { get; set; }
     }
 }
