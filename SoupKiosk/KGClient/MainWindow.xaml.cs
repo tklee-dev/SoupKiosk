@@ -229,6 +229,8 @@ namespace KGClient
                     StartRequestWCF();
 
                     WindowTurnOffChecker();
+
+                    Title = "Running";
                 }
                 else
                 {
@@ -700,6 +702,7 @@ namespace KGClient
         //! Clikc: 중지
         private void Button_PortClose(object sender, RoutedEventArgs e)
         {
+            Title = "Stop";
             if (windowWeb != null)
             {
                 windowWeb.Close();
