@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:KGClient"
         mc:Ignorable="d"
         WindowStyle="ToolWindow"
-        Title="DeviceDemon v2.0" Height="370" Width="520">
+        Title="DeviceDemon v2.4" Height="370" Width="520">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -63,6 +63,12 @@
                         <TextBlock Text="분" IsEnabled="False"/>
                     </StackPanel>
 
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="Stapler" Width="60"/>
+                        <CheckBox  x:Name="checkUseStapler" Click="button_UseOff"/>
+                    </StackPanel>
+
+
                     <Button Content="설정값 저장"  Click="Button_SaveSettings" Height="40" />
 
                 </StackPanel>
@@ -73,9 +79,9 @@
                 <CheckBox x:Name="ckTest"/>
             </StackPanel>-->
         </StackPanel>
-        
-        
-        
+
+
+
         <GroupBox  Grid.Column="1" Header="테스트">
             <StackPanel  Orientation="Vertical">
 

@@ -35,7 +35,6 @@ using System.Threading;
 
 - HID값 강제 ASCII값
 
-- 프린터 드라이버, SFTP, 프로그램 수정사항 챙기기
 
  */
 
@@ -137,8 +136,8 @@ namespace KGClient
         //HID 데이터 이벤트
         public void ReceivedHIDData(string hidNum)
         {
-            ////! TEST
-            ////hidNum = "25500001";
+            //! TEST
+            //hidNum = "25500001";
             //http://localhost:7001/Service1.svc/setdataHID/99
             //http://localhost:7001/Service1.svc/getdata/111?callback=222
             //lastHIDnum = hidNum.Trim();
@@ -148,16 +147,12 @@ namespace KGClient
             requestHTTP.SetDataToServer(requestURL);
         }
 
-        //! PDF Watcher (PDF생성시 LIST넣음,
-        //! 1. 파일에 HID값이 포함안된경우 바로 삭제. ← 삭제예정
-        //! 2. printRequestNames없는 값일 경우 삭제 (다른메서드에서)
+        //! PDF Watcher (PDF생성시 LIST넣음)
         public void PDFCreated(FileSystemEventArgs e)
         {
             Logger.Log("PDF생성감지: " + e.FullPath);
             printCurrentNames.Add(System.IO.Path.ChangeExtension(e.Name, null));
             printCurrentPath.Add(e.FullPath);
-
-
         }
 
         public void PDFDeleted(string filePath)
@@ -216,8 +211,14 @@ namespace KGClient
                         MessageBox.Show("MIO 초기화 실패");
                     }
 
+                    Title = "Running";
+
                     //! PDF Watcher
-                    pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
+
+                    if (pdfWatcher == null)
+                        pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
+
+
                     Logger.Log("Watcher 구동완료" + tbPDFDir.Text);
 
 
@@ -230,7 +231,6 @@ namespace KGClient
 
                     WindowTurnOffChecker();
 
-                    Title = "Running";
                 }
                 else
                 {
@@ -349,7 +349,10 @@ namespace KGClient
                             string requestURL = regControl._ServerURL + "setdataStaplerPrinter/" + "P01";
                             requestHTTP.SetDataToServer(requestURL);
 
-                            bool res = await printProcess.PrintProc(printerName, _printCurrentPath, mioControl);
+
+
+
+                            bool res = await printProcess.PrintProc(printerName, _printCurrentPath, mioControl, checkUseStapler.IsChecked);
                             if (res)
                             {
                                 Logger.Log("출력 완료");
@@ -402,11 +405,14 @@ namespace KGClient
 
         private void AfterPrintWorkClear()
         {
+
             Logger.Log("AfterPrintWorkClear()");
             printRequestNames.Clear();
             printCurrentNames.Clear();
             printCurrentPath.Clear();
-            afterPrintResponseTimer.Stop();
+
+            if (afterPrintResponseTimer != null)
+                afterPrintResponseTimer.Stop();
 
             //파일 내 모든 파일삭제
             try
@@ -624,7 +630,7 @@ namespace KGClient
                 string path = AppDomain.CurrentDomain.BaseDirectory;
                 List<string> pdfPathList = new List<string>();
                 pdfPathList.Add(System.IO.Path.Combine(path, "SamplePDF", "사업자등록증(에니텍시스)_전자세금계산서.pdf"));
-                bool res = await printProcess.PrintProc(cbPrinter.SelectedItem.ToString(), pdfPathList, mioControl);
+                bool res = await printProcess.PrintProc(cbPrinter.SelectedItem.ToString(), pdfPathList, mioControl, checkUseStapler.IsChecked);
             }
         }
 
@@ -659,7 +665,8 @@ namespace KGClient
         //! Click: PDF Watcher
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
+            if (pdfWatcher == null)
+                pdfWatcher = new PDFWatcher(this, tbPDFDir.Text);
         }
         #endregion
 
@@ -702,7 +709,12 @@ namespace KGClient
         //! Clikc: 중지
         private void Button_PortClose(object sender, RoutedEventArgs e)
         {
+
+            Logger.Log("중지B");
             Title = "Stop";
+
+            AfterPrintWorkClear();
+
             if (windowWeb != null)
             {
                 windowWeb.Close();
@@ -786,6 +798,8 @@ namespace KGClient
             tbPDFDir.Text = regControl._PDFDirPath;
             tbServerURL.Text = regControl._ServerURL;
             tbWebURL.Text = regControl._WebURL;
+            checkUseStapler.IsChecked = Convert.ToBoolean(regControl._UseStapler);
+
 
             if (string.IsNullOrEmpty(regControl._OffTime))
             {
@@ -807,28 +821,28 @@ namespace KGClient
         //! Click: 세팅값 저장 (Registry)
         private void Button_SaveSettings(object sender, RoutedEventArgs e)
         {
+            regControl.ChangeReg(RegKeyNames.UseStapler, checkUseStapler.IsChecked.ToString());
             //입력되지 않은 컨트롤이 있는지 확인
             if (IsUserInputValid() == true)
-                ////! TEST
-                if (true)
-                {
-                    regControl.ChangeReg(RegKeyNames.MIOPort, cbMio.SelectedItem.ToString());
-                    regControl.ChangeReg(RegKeyNames.HIDPort, cbHID.SelectedItem.ToString());
-                    regControl.ChangeReg(RegKeyNames.PrinterName, cbPrinter.SelectedItem.ToString());
-                    regControl.ChangeReg(RegKeyNames.PDFDirPath, tbPDFDir.Text);
-                    regControl.ChangeReg(RegKeyNames.ServerURL, tbServerURL.Text);
-                    regControl.ChangeReg(RegKeyNames.WebURL, tbWebURL.Text);
+            {
+                regControl.ChangeReg(RegKeyNames.MIOPort, cbMio.SelectedItem.ToString());
+                regControl.ChangeReg(RegKeyNames.HIDPort, cbHID.SelectedItem.ToString());
+                regControl.ChangeReg(RegKeyNames.PrinterName, cbPrinter.SelectedItem.ToString());
+                regControl.ChangeReg(RegKeyNames.PDFDirPath, tbPDFDir.Text);
+                regControl.ChangeReg(RegKeyNames.ServerURL, tbServerURL.Text);
+                regControl.ChangeReg(RegKeyNames.WebURL, tbWebURL.Text);
+                regControl.ChangeReg(RegKeyNames.UseStapler, checkUseStapler.IsChecked.ToString());
 
-                    if (checkUseOff.IsChecked == true)
-                        regControl.ChangeReg(RegKeyNames.OffTime, tbHour.Text + "^" + tbMinute.Text);
-                    else
-                        regControl.ChangeReg(RegKeyNames.OffTime, "");
-                    MessageBox.Show("저장 완료");
-                }
+                if (checkUseOff.IsChecked == true)
+                    regControl.ChangeReg(RegKeyNames.OffTime, tbHour.Text + "^" + tbMinute.Text);
                 else
-                {
-                    MessageBox.Show("설정값이 입력되지 않았습니다(1)");
-                }
+                    regControl.ChangeReg(RegKeyNames.OffTime, "");
+                MessageBox.Show("저장 완료");
+            }
+            else
+            {
+                MessageBox.Show("설정값이 입력되지 않았습니다(1)");
+            }
         }
 
 
@@ -900,6 +914,6 @@ namespace KGClient
 
         #endregion
 
-        
+
     }
 }

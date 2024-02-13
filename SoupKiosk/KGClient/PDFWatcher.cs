@@ -11,13 +11,14 @@ namespace KGClient
     public class PDFWatcher
     {
         MainWindow mainWindow = null;
+        FileSystemWatcher watcher = null;
         public PDFWatcher(MainWindow mainWindow, string path)
         {
             try
             {
                 this.mainWindow = mainWindow;
 
-                FileSystemWatcher watcher = new FileSystemWatcher();
+                watcher = new FileSystemWatcher();
                 watcher = new FileSystemWatcher(path, "*.pdf");
 
                 // 생성
@@ -28,7 +29,7 @@ namespace KGClient
                 //watcher.Renamed += watcher_Renamed;
                 //// 에러
                 //watcher.Error += watcher_Error;
-                watcher.IncludeSubdirectories = true;
+                watcher.IncludeSubdirectories = false;
                 watcher.EnableRaisingEvents = true;
             }
             catch (Exception e)
@@ -46,6 +47,12 @@ namespace KGClient
         {
             mainWindow.PDFDeleted(e.FullPath);
         }
-    
+
+        ~PDFWatcher()
+        {
+            watcher.Created -= watcher_Created;
+            watcher.Deleted -= watcher_Deleted;
+        }
+
     }
 }

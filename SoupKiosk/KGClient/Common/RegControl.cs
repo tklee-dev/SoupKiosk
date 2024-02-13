@@ -19,7 +19,8 @@ namespace KGClient
         PDFDirPath,
         ServerURL,
         WebURL,
-        OffTime
+        OffTime,
+        UseStapler
     }
 
     /// <summary>
@@ -56,6 +57,7 @@ namespace KGClient
                     reg.SetValue("ServerURL", "999");
                     reg.SetValue("WebURL", "999");
                     reg.SetValue("OffTime", "999");
+                    reg.SetValue("UseStapler", "false");
                 }
             }
             catch (Exception e)
@@ -71,6 +73,7 @@ namespace KGClient
         public string _ServerURL { get; set; }
         public string _WebURL { get; set; }
         public string _OffTime { get; set; }
+        public string _UseStapler { get; set; }
 
 
         /// <summary>
@@ -87,6 +90,7 @@ namespace KGClient
             _ServerURL = reg.GetValue("ServerURL")?.ToString();
             _WebURL = reg.GetValue("WebURL")?.ToString();
             _OffTime = reg.GetValue("OffTime")?.ToString();
+            _UseStapler = reg.GetValue("UseStapler")?.ToString();
 
         }
 
@@ -121,6 +125,9 @@ namespace KGClient
                     break;
                 case RegKeyNames.OffTime:
                     reg.SetValue("OffTime", value);
+                    break;
+                case RegKeyNames.UseStapler:
+                    reg.SetValue("UseStapler", value);
                     break;
                 default:
                     break;

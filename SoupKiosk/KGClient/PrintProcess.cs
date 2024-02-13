@@ -19,8 +19,13 @@ namespace KGClient
 
         }
 
-        public async Task<bool> PrintProc(string printerName, List<string> pdfPathList, MioControl mioControl)
+        public async Task<bool> PrintProc(string printerName, List<string> pdfPathList, MioControl mioControl, bool? useStapler)
         {
+            bool _useStapler = false;
+            if (useStapler == true)
+                _useStapler = true;
+            else
+                _useStapler = false;
 
 
 
@@ -113,18 +118,18 @@ namespace KGClient
                 }
 
 
-                bool useStapler = false;
-                if (pdfPathList.Count > 1)
-                    useStapler = true;
-                else
-                    useStapler = false;
+                ////bool useStapler = false;
+                ////if (pdfPathList.Count > 1)
+                ////    useStapler = true;
+                ////else
+                ////    useStapler = false;
 
                 Logger.DevH(LogH, $"인증기 페이지 설정 - {pdfPathList.Count} 장");
                 //인증기 명령
                 //if (await _Stapler.SetPageAsync(model.BasicInfo.NumberOfPages, model.BasicInfo.NumberOfPages > 1) == false)
                 //! 인증기 설정 ( 장수 1: (테스트) , Stapler사용 여부)
 
-                if (await mioControl.Stapler.SetPageAsync(pdfPathList.Count, useStapler) == false)
+                if (await mioControl.Stapler.SetPageAsync(pdfPathList.Count, _useStapler) == false)
                 {
                     //todo 인증기 설정 실패시 
                     //Logger.DevErrorH(LogH, $"인증기 페이지 설정 - 실패: {_Stapler.ErrorStatus.GetCode()}, {_Stapler.ErrorStatus.GetDescription()}");
