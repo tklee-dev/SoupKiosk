@@ -68,7 +68,7 @@ namespace KGClient
             }
         }
 
-        public static void Print(string pdfFilePath, bool useDebenuRenderer = false)
+        public static void Print(string pdfFilePath, bool useDebenuRenderer = true)
         {
             var lib = new PDFLibrary("DebenuPDFLibraryDLL1311.dll");
             if (lib.LibraryLoaded() == false)
