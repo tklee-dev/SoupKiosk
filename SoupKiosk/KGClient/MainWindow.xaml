@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:KGClient"
         mc:Ignorable="d"
         WindowStyle="ToolWindow"
-        Title="DeviceDemon v2.4" Height="370" Width="520">
+        Title="DeviceDemon v2.4_r3" Height="370" Width="520">
 
     <Grid>
         <Grid.ColumnDefinitions>
